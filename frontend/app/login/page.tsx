@@ -35,7 +35,7 @@ export default function LoginPage() {
           name: authData.name,
           role: authData.role,
         });
-        router.push('/dashboard');
+        router.push('/'); // ダッシュボード（ルートパス）にリダイレクト
       } else {
         const response = await apiClient.post('/api/auth/register', data);
         const authData = response.data;
@@ -46,7 +46,7 @@ export default function LoginPage() {
           name: authData.name,
           role: authData.role,
         });
-        router.push('/dashboard');
+        router.push('/'); // ダッシュボード（ルートパス）にリダイレクト
       }
     } catch (err: any) {
       setError(err.response?.data?.error || 'エラーが発生しました');

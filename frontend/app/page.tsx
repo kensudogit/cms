@@ -1,21 +1,39 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuthStore } from '@/store/authStore';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { Content } from '@/lib/types';
+import { getMockContents } from '@/lib/mockData';
 
 export default function Home() {
   const user = useAuthStore((state) => state.user);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const token = useAuthStore((state) => state.token);
 
+  // モックデータを使用するか、APIから取得するか
+  const useMockData = typeof window !== 'undefined' 
+    ? (process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || localStorage.getItem('useMockData') === 'true')
+    : process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
+
   const { data: contents, isLoading } = useQuery<Content[]>({
-    queryKey: ['contents'],
+    queryKey: ['contents', useMockData],
     queryFn: async () => {
-      const response = await apiClient.get('/api/content');
-      return response.data;
+      if (useMockData) {
+        // モックデータを使用
+        return getMockContents();
+      }
+      try {
+        // APIから取得を試みる
+        const response = await apiClient.get('/api/content');
+        return response.data;
+      } catch (error) {
+        // APIエラーの場合はモックデータを返す
+        console.warn('API request failed, using mock data:', error);
+        return getMockContents();
+      }
     },
   });
 
@@ -29,10 +47,15 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+              <div className="relative w-10 h-10 flex items-center justify-center">
+                <Image
+                  src="/PC.png"
+                  alt="CMS Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                  priority
+                />
               </div>
               <h1 className="text-2xl font-bold gradient-text">CMS ダッシュボード</h1>
             </div>
