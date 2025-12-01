@@ -1,0 +1,16 @@
+node_modules
+.next
+.vercel
+*.log
+.DS_Store
+*.local
+.env*.local
+coverage
+.vscode
+.idea
+*.test.ts
+*.test.tsx
+vitest.config.ts
+vitest.setup.ts
+vitest.d.ts
+
