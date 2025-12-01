@@ -13,27 +13,23 @@ export default function Home() {
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const token = useAuthStore((state) => state.token);
 
-  // モックデータを使用するか、APIから取得するか
-  const useMockData = typeof window !== 'undefined' 
-    ? (process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || localStorage.getItem('useMockData') === 'true')
-    : process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
-
+  // デフォルトでモックデータを使用（APIが利用できない場合のフォールバック）
   const { data: contents, isLoading } = useQuery<Content[]>({
-    queryKey: ['contents', useMockData],
+    queryKey: ['contents'],
     queryFn: async () => {
-      if (useMockData) {
-        // モックデータを使用
-        return getMockContents();
-      }
+      // まずモックデータを返す（常にモックデータを使用）
+      return getMockContents();
+      
+      // 将来的にAPIを使用する場合は以下のコードを有効化
+      /*
       try {
-        // APIから取得を試みる
         const response = await apiClient.get('/api/content');
         return response.data;
       } catch (error) {
-        // APIエラーの場合はモックデータを返す
         console.warn('API request failed, using mock data:', error);
         return getMockContents();
       }
+      */
     },
   });
 
