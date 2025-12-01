@@ -1,0 +1,119 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: CMS Microservices Lambda Functions
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: java17
+    Environment:
+      Variables:
+        SPRING_PROFILES_ACTIVE: lambda
+
+Resources:
+  AuthServiceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../services/auth-service
+      Handler: com.cms.auth.AuthServiceApplication::handleRequest
+      SnapStart:
+        ApplyOn: PublishedVersions
+      Environment:
+        Variables:
+          SPRING_DATASOURCE_URL: !Ref DatabaseUrl
+          SPRING_DATASOURCE_USERNAME: !Ref DatabaseUsername
+          SPRING_DATASOURCE_PASSWORD: !Ref DatabasePassword
+          JWT_SECRET: !Ref JwtSecret
+      Events:
+        AuthApi:
+          Type: Api
+          Properties:
+            Path: /api/auth/{proxy+}
+            Method: ANY
+
+  ContentServiceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../services/content-service
+      Handler: com.cms.content.ContentServiceApplication::handleRequest
+      SnapStart:
+        ApplyOn: PublishedVersions
+      Environment:
+        Variables:
+          SPRING_DATASOURCE_URL: !Ref DatabaseUrl
+          SPRING_DATASOURCE_USERNAME: !Ref DatabaseUsername
+          SPRING_DATASOURCE_PASSWORD: !Ref DatabasePassword
+      Events:
+        ContentApi:
+          Type: Api
+          Properties:
+            Path: /api/content/{proxy+}
+            Method: ANY
+
+  MediaServiceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../services/media-service
+      Handler: com.cms.media.MediaServiceApplication::handleRequest
+      SnapStart:
+        ApplyOn: PublishedVersions
+      Timeout: 60
+      MemorySize: 1024
+      Environment:
+        Variables:
+          SPRING_DATASOURCE_URL: !Ref DatabaseUrl
+          SPRING_DATASOURCE_USERNAME: !Ref DatabaseUsername
+          SPRING_DATASOURCE_PASSWORD: !Ref DatabasePassword
+          AWS_S3_BUCKET: !Ref S3Bucket
+          AWS_REGION: ap-northeast-1
+      Events:
+        MediaApi:
+          Type: Api
+          Properties:
+            Path: /api/media/{proxy+}
+            Method: ANY
+
+  UserServiceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../services/user-service
+      Handler: com.cms.user.UserServiceApplication::handleRequest
+      SnapStart:
+        ApplyOn: PublishedVersions
+      Environment:
+        Variables:
+          SPRING_DATASOURCE_URL: !Ref DatabaseUrl
+          SPRING_DATASOURCE_USERNAME: !Ref DatabaseUsername
+          SPRING_DATASOURCE_PASSWORD: !Ref DatabasePassword
+      Events:
+        UserApi:
+          Type: Api
+          Properties:
+            Path: /api/users/{proxy+}
+            Method: ANY
+
+Parameters:
+  DatabaseUrl:
+    Type: String
+    Description: PostgreSQL database URL
+  DatabaseUsername:
+    Type: String
+    Description: Database username
+  DatabasePassword:
+    Type: String
+    NoEcho: true
+    Description: Database password
+  JwtSecret:
+    Type: String
+    NoEcho: true
+    Description: JWT secret key
+  S3Bucket:
+    Type: String
+    Description: S3 bucket name for media files
+
+Outputs:
+  ApiGatewayUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
+

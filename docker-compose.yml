@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Databases
+  postgres-auth:
+    image: postgres:14
+    container_name: cms-postgres-auth
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-auth-data:/var/lib/postgresql/data
+    networks:
+      - cms-network
+
+  postgres-content:
+    image: postgres:14
+    container_name: cms-postgres-content
+    environment:
+      POSTGRES_DB: content_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-content-data:/var/lib/postgresql/data
+    networks:
+      - cms-network
+
+  postgres-media:
+    image: postgres:14
+    container_name: cms-postgres-media
+    environment:
+      POSTGRES_DB: media_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-media-data:/var/lib/postgresql/data
+    networks:
+      - cms-network
+
+  postgres-user:
+    image: postgres:14
+    container_name: cms-postgres-user
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-user-data:/var/lib/postgresql/data
+    networks:
+      - cms-network
+
+volumes:
+  postgres-auth-data:
+  postgres-content-data:
+  postgres-media-data:
+  postgres-user-data:
+
+networks:
+  cms-network:
+    driver: bridge
+

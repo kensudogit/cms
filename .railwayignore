@@ -1,0 +1,17 @@
+node_modules/
+.git/
+.idea/
+*.iml
+.vscode/
+*.log
+.env
+.env.local
+.DS_Store
+Thumbs.db
+build/
+.gradle/
+.next/
+out/
+coverage/
+.vitest/
+
