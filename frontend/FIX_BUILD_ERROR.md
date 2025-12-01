@@ -74,3 +74,5 @@ npm install next@latest
 - [ ] `tailwind.config.js`が存在する
 - [ ] `app/globals.css`に`@tailwind`ディレクティブが含まれている
 
+
+

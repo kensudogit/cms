@@ -139,3 +139,5 @@ NEXT_PUBLIC_API_BASE_URL: 'http://localhost:8081'
 
 ただし、これは一時的な解決策です。API Gateway経由での接続を推奨します。
 
+
+

@@ -124,3 +124,5 @@ chmod +x gradlew && ./gradlew :services:api-gateway:build -x test
 - `git update-index --chmod=+x gradlew`を実行すると、Gitで実行権限が追跡されます
 - RailwayはLinux環境でビルドするため、実行権限が必要です
 
+
+

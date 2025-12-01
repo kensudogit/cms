@@ -32,7 +32,8 @@ apiClient.interceptors.response.use(
       if (typeof window !== 'undefined') {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
-        window.location.href = '/login';
+        // ログインページを無効化したため、ダッシュボードにリダイレクト
+        // window.location.href = '/login';
       }
     }
     return Promise.reject(error);

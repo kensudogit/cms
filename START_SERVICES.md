@@ -146,3 +146,5 @@ gradlew.bat :services:auth-service:bootRun
 
 各サービスは起動に30-60秒かかります。すべてのサービスが起動するまで待ってからフロントエンドを使用してください。
 
+
+

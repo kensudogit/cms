@@ -152,3 +152,5 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 
 **CMSプロジェクトでは、Java Lambda + Fargateのハイブリッド構成が推奨されます。**
 
+
+

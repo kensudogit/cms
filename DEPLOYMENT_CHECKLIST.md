@@ -177,3 +177,5 @@ NEXT_PUBLIC_API_BASE_URL=https://your-api-gateway-url.railway.app
 NODE_ENV=production
 ```
 
+
+

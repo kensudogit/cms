@@ -115,3 +115,5 @@ git update-index --chmod=+x services/*/gradlew
 - RailwayはLinux環境でビルドするため、実行権限が必要です
 - 変更をプッシュした後、Railwayで再デプロイが必要です
 
+
+

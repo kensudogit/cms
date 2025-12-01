@@ -177,3 +177,5 @@
 - Fargate: 長時間実行が必要なサービス
 - API Gateway: AWS API Gatewayを使用
 
+
+

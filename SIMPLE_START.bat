@@ -23,3 +23,5 @@ echo   http://localhost:8080/api/auth/health
 echo.
 pause
 
+
+

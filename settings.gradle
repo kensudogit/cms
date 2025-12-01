@@ -12,3 +12,5 @@ project(':services:content-service').projectDir = file('services/content-service
 project(':services:media-service').projectDir = file('services/media-service')
 project(':services:user-service').projectDir = file('services/user-service')
 
+
+

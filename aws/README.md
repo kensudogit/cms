@@ -92,3 +92,5 @@ docker-compose up -d
 - VPC: 必要に応じてVPC内にデプロイ
 - Secrets Manager: 機密情報はSecrets Managerを使用
 
+
+

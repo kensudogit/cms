@@ -15,3 +15,5 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     boolean existsBySlug(String slug);
 }
 
+
+

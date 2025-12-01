@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'CMS - Content Management System',
   description: 'Webシステムリプレース CMS設計',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
