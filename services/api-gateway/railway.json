@@ -2,10 +2,10 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "chmod +x gradlew && ./gradlew build -x test"
+    "buildCommand": "chmod +x ../../gradlew && cd ../.. && ./gradlew :services:api-gateway:build -x test"
   },
   "deploy": {
-    "startCommand": "java -jar build/libs/*.jar",
+    "startCommand": "java -jar ../../build/libs/api-gateway.jar",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }

@@ -1,0 +1,12 @@
+[phases.setup]
+nixPkgs = ["jdk21", "gradle"]
+
+[phases.build]
+cmds = [
+  "chmod +x ../../gradlew || true",
+  "cd ../.. && ./gradlew :services:content-service:build -x test"
+]
+
+[phases.start]
+cmd = "cd ../.. && java -jar build/libs/content-service.jar"
+
