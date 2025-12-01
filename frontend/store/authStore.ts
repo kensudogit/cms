@@ -17,7 +17,6 @@ interface AuthState {
     role: string;
   }) => void;
   clearAuth: () => void;
-  isAuthenticated: () => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -48,13 +47,15 @@ export const useAuthStore = create<AuthState>()(
           user: null,
         });
       },
-      isAuthenticated: () => {
-        return get().token !== null;
-      },
     }),
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        token: state.token,
+        userId: state.userId,
+        user: state.user,
+      }),
     }
   )
 );

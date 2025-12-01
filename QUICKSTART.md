@@ -3,7 +3,7 @@
 ## 前提条件
 
 - Node.js 18以上
-- Java 17以上
+- Java 21以上（LTS）
 - PostgreSQL 14以上
 - Docker (オプション)
 

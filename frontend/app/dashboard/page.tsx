@@ -10,13 +10,15 @@ import { Content } from '@/lib/types';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, clearAuth, isAuthenticated } = useAuthStore();
+  const user = useAuthStore((state) => state.user);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const token = useAuthStore((state) => state.token);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
+    if (!token) {
       router.push('/login');
     }
-  }, [router, isAuthenticated]);
+  }, [router, token]);
 
   const { data: contents, isLoading } = useQuery<Content[]>({
     queryKey: ['contents'],
