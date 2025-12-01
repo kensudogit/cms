@@ -14,11 +14,12 @@ export default function DashboardPage() {
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const token = useAuthStore((state) => state.token);
 
-  useEffect(() => {
-    if (!token) {
-      router.push('/login');
-    }
-  }, [router, token]);
+  // ログインチェックを一時的に無効化
+  // useEffect(() => {
+  //   if (!token) {
+  //     router.push('/login');
+  //   }
+  // }, [router, token]);
 
   const { data: contents, isLoading } = useQuery<Content[]>({
     queryKey: ['contents'],
@@ -30,12 +31,13 @@ export default function DashboardPage() {
 
   const handleLogout = () => {
     clearAuth();
-    router.push('/login');
+    router.push('/dashboard'); // ログアウト後もダッシュボードに戻る
   };
 
-  if (!user) {
-    return null;
-  }
+  // ユーザー情報がない場合の表示を変更
+  // if (!user) {
+  //   return null;
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -46,13 +48,17 @@ export default function DashboardPage() {
               <h1 className="text-xl font-bold text-gray-900">CMS Dashboard</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700">Welcome, {user.name}</span>
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-              >
-                Logout
-              </button>
+              <span className="text-gray-700">
+                {user ? `Welcome, ${user.name}` : 'Welcome, Guest'}
+              </span>
+              {user && (
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                >
+                  Logout
+                </button>
+              )}
             </div>
           </div>
         </div>
