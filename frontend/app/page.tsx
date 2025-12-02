@@ -51,6 +51,7 @@ export default function Home() {
                   height={40}
                   className="object-contain"
                   priority
+                  unoptimized
                 />
               </div>
               <h1 className="text-2xl font-bold gradient-text">CMS ダッシュボード</h1>
