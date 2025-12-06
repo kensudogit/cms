@@ -9,10 +9,7 @@ export const metadata: Metadata = {
   title: 'CMS - Content Management System',
   description: 'Webシステムリプレース CMS設計',
   icons: {
-    icon: [
-      { url: '/PC.png', sizes: 'any' },
-      { url: '/favicon.ico', sizes: 'any' },
-    ],
+    icon: '/PC.png',
     shortcut: '/PC.png',
     apple: '/PC.png',
   },

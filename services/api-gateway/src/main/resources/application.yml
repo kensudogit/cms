@@ -34,15 +34,20 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins: ${ALLOWED_ORIGINS:http://localhost:3000}
+            allowedOrigins: 
+              - ${ALLOWED_ORIGINS:http://localhost:3000}
+              - http://localhost:3002
+              - http://localhost:3001
             allowedMethods:
               - GET
               - POST
               - PUT
               - DELETE
               - OPTIONS
+              - PATCH
             allowedHeaders: '*'
             allowCredentials: true
+            maxAge: 3600
 
 jwt:
   secret: ${JWT_SECRET:your-secret-key-change-in-production}

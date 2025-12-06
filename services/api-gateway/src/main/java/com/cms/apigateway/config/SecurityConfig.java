@@ -13,13 +13,11 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> {
+                }) // CORSを有効化（CorsWebFilterが自動的に適用される）
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/auth/**", "/actuator/health").permitAll()
-                        .anyExchange().authenticated()
-                );
+                        .anyExchange().authenticated());
         return http.build();
     }
 }
-
-
-
