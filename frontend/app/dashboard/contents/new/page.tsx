@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useAuthStore } from '@/store/authStore';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
-import { ContentRequest } from '@/lib/types';
+import { ContentRequest, University, ContentCategory } from '@/lib/types';
 
 export default function NewContentPage() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function NewContentPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const { data: universities } = useQuery({
+  const { data: universities } = useQuery<University[]>({
     queryKey: ['universities'],
     queryFn: async () => {
       const response = await apiClient.get('/api/university/active');
@@ -37,7 +37,7 @@ export default function NewContentPage() {
 
   const universityId = watch('universityId');
 
-  const { data: categories } = useQuery({
+  const { data: categories } = useQuery<ContentCategory[]>({
     queryKey: ['categories', universityId],
     queryFn: async () => {
       if (!universityId) return [];
@@ -149,7 +149,7 @@ export default function NewContentPage() {
                   {...register('universityId', { required: '大学を選択してください', valueAsNumber: true })}
                   className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium cursor-pointer"
                 >
-                  {universities?.map((univ) => (
+                  {universities?.map((univ: University) => (
                     <option key={univ.id} value={univ.id}>
                       {univ.name}
                     </option>
@@ -175,7 +175,7 @@ export default function NewContentPage() {
                   disabled={!universityId || !categories || categories.length === 0}
                 >
                   <option value="">カテゴリを選択（オプション）</option>
-                  {categories?.map((cat: any) => (
+                  {categories?.map((cat: ContentCategory) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>
