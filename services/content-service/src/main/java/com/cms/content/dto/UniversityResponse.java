@@ -23,3 +23,4 @@ public class UniversityResponse {
     private LocalDateTime updatedAt;
 }
 
+

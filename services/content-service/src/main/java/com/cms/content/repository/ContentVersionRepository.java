@@ -14,3 +14,4 @@ public interface ContentVersionRepository extends JpaRepository<ContentVersion, 
     Integer countByContentId(Long contentId);
 }
 
+

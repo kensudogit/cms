@@ -23,3 +23,4 @@ public class ContentTemplateResponse {
     private LocalDateTime updatedAt;
 }
 
+

@@ -23,16 +23,6 @@ export default function NewContentPage() {
     },
   });
 
-  const { data: categories } = useQuery({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      if (!watch('universityId')) return [];
-      const response = await apiClient.get(`/api/content-category/university/${watch('universityId')}`);
-      return response.data;
-    },
-    enabled: !!watch('universityId'),
-  });
-
   const {
     register,
     handleSubmit,
@@ -43,6 +33,18 @@ export default function NewContentPage() {
       status: 'DRAFT',
       universityId: universities?.[0]?.id || 1,
     },
+  });
+
+  const universityId = watch('universityId');
+
+  const { data: categories } = useQuery({
+    queryKey: ['categories', universityId],
+    queryFn: async () => {
+      if (!universityId) return [];
+      const response = await apiClient.get(`/api/content-category/university/${universityId}`);
+      return response.data;
+    },
+    enabled: !!universityId,
   });
 
   const onSubmit = async (data: ContentRequest) => {
@@ -170,7 +172,7 @@ export default function NewContentPage() {
                 <select
                   {...register('categoryId', { valueAsNumber: true })}
                   className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium cursor-pointer"
-                  disabled={!watch('universityId') || !categories || categories.length === 0}
+                  disabled={!universityId || !categories || categories.length === 0}
                 >
                   <option value="">カテゴリを選択（オプション）</option>
                   {categories?.map((cat: any) => (

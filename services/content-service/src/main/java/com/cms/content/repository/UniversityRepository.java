@@ -14,3 +14,4 @@ public interface UniversityRepository extends JpaRepository<University, Long> {
     boolean existsByCode(String code);
 }
 
+

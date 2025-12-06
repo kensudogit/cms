@@ -14,3 +14,4 @@ public interface ContentCategoryRepository extends JpaRepository<ContentCategory
     boolean existsByUniversityIdAndSlug(Long universityId, String slug);
 }
 
+

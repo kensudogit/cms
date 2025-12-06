@@ -14,3 +14,4 @@ public interface ContentTemplateRepository extends JpaRepository<ContentTemplate
     Optional<ContentTemplate> findByIdAndUniversityId(Long id, Long universityId);
 }
 
+

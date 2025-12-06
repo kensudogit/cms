@@ -71,3 +71,4 @@ ALLOWED_ORIGINS=*
 
 詳細は `DEPLOYMENT_GUIDE.md` を参照してください。
 
+

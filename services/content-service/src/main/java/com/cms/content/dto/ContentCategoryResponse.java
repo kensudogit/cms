@@ -23,3 +23,4 @@ public class ContentCategoryResponse {
     private LocalDateTime updatedAt;
 }
 
+

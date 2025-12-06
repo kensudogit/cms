@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -15,22 +15,38 @@ export default function Home() {
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const token = useAuthStore((state) => state.token);
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+  const [hasAuth, setHasAuth] = useState(false);
 
-  // 未認証の場合はログインページにリダイレクト（ローカルストレージもチェック）
+  // クライアント側でのみ実行
   useEffect(() => {
+    setIsClient(true);
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('auth-storage');
+    const hasStoredAuth = !!(storedToken || storedUser);
     
-    if (!user && !token && !storedToken && !storedUser) {
+    if (!user && !token && !hasStoredAuth) {
       router.push('/login');
       return;
     }
+    
+    setHasAuth(!!(user || token || hasStoredAuth));
   }, [user, token, router]);
 
+  // サーバー側レンダリング時は何も表示しない（ハイドレーションエラーを防ぐ）
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600"></div>
+          <p className="mt-4 text-slate-600">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
   // 未認証の場合は何も表示しない（リダイレクト中）
-  // ただし、ローカルストレージに認証情報がある場合は表示を許可
-  const hasStoredAuth = typeof window !== 'undefined' && (localStorage.getItem('token') || localStorage.getItem('auth-storage'));
-  if (!user && !token && !hasStoredAuth) {
+  if (!hasAuth) {
     return null;
   }
 
@@ -42,12 +58,21 @@ export default function Home() {
         // APIからコンテンツ一覧を取得
         const response = await apiClient.get('/api/content');
         return response.data;
-      } catch (error) {
+      } catch (error: any) {
         // APIが失敗した場合、モックデータをフォールバックとして使用
-        console.warn('API request failed, using mock data:', error);
+        // 接続エラーの場合は警告のみ（開発環境）
+        if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('API接続エラー: バックエンドサーバーが起動していない可能性があります。モックデータを使用します。');
+          }
+        } else {
+          console.warn('API request failed, using mock data:', error);
+        }
         return getMockContents();
       }
     },
+    retry: false, // 接続エラーの場合はリトライしない
+    refetchOnWindowFocus: false, // ウィンドウフォーカス時の自動再取得を無効化
   });
 
   const handleLogout = () => {
