@@ -125,15 +125,38 @@ ENTRYPOINT ["sh", "-c", "java -jar -Dserver.port=${PORT:-8083} app.jar --spring.
 
 ### ビルドがまだ失敗する場合
 
+#### エラー: `chmod: cannot access 'gradlew': No such file or directory`
+
+このエラーは、Railwayの**Root Directory**設定が原因です。
+
+**解決方法**:
+
+1. **Railwayダッシュボードで設定を確認**
+   - サービスを選択 → **Settings**タブ
+   - **Root Directory**を確認
+   - **Root Directory**を`/`（プロジェクトルート）または空欄に設定
+   - **Dockerfile Path**を`services/user-service/Dockerfile`に設定
+
+2. **すべてのサービスで同様の設定を確認**
+   - user-service: Root Directory = `/`, Dockerfile Path = `services/user-service/Dockerfile`
+   - media-service: Root Directory = `/`, Dockerfile Path = `services/media-service/Dockerfile`
+   - api-gateway: Root Directory = `/`, Dockerfile Path = `services/api-gateway/Dockerfile`
+   - auth-service: Root Directory = `/`, Dockerfile Path = `services/auth-service/Dockerfile`
+   - content-service: Root Directory = `/`, Dockerfile Path = `services/content-service/Dockerfile`
+
+3. **再デプロイ**
+   - 設定を変更した後、サービスを再デプロイ
+   - ビルドログを確認してエラーが解消されたことを確認
+
+詳細は `RAILWAY_DOCKER_BUILD_CONTEXT.md` を参照してください。
+
+### その他のトラブルシューティング
+
 1. **Dockerfileのパスを確認**
    - Railwayの**Settings** → **Dockerfile Path**が正しいか確認
    - `services/user-service/Dockerfile`または`services/media-service/Dockerfile`
 
-2. **ビルドコンテキストを確認**
-   - **Settings** → **Root Directory**が正しいか確認
-   - プロジェクトルート（`/`）またはサービスディレクトリ（`services/user-service`など）
-
-3. **ビルドログを詳細に確認**
+2. **ビルドログを詳細に確認**
    - エラーメッセージを確認
    - Gradleビルドが成功しているか確認
 
