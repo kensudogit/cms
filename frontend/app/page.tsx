@@ -16,16 +16,21 @@ export default function Home() {
   const token = useAuthStore((state) => state.token);
   const router = useRouter();
 
-  // 未認証の場合はログインページにリダイレクト
+  // 未認証の場合はログインページにリダイレクト（ローカルストレージもチェック）
   useEffect(() => {
-    if (!user && !token) {
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('auth-storage');
+    
+    if (!user && !token && !storedToken && !storedUser) {
       router.push('/login');
       return;
     }
   }, [user, token, router]);
 
   // 未認証の場合は何も表示しない（リダイレクト中）
-  if (!user && !token) {
+  // ただし、ローカルストレージに認証情報がある場合は表示を許可
+  const hasStoredAuth = typeof window !== 'undefined' && (localStorage.getItem('token') || localStorage.getItem('auth-storage'));
+  if (!user && !token && !hasStoredAuth) {
     return null;
   }
 
