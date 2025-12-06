@@ -35,6 +35,36 @@ public class Content {
     @Column(nullable = false)
     private Long authorId;
 
+    @Column(nullable = false)
+    private Long universityId; // 大学ID（マルチテナント対応）
+
+    @Column
+    private Long categoryId; // カテゴリID（オプション）
+
+    @Column
+    private String contentType; // コンテンツタイプ（例: "入学手続き", "卒業手続き", "お知らせ"）
+
+    @Column(columnDefinition = "TEXT")
+    private String metaDescription; // SEO用メタ説明
+
+    @Column
+    private String metaKeywords; // SEO用キーワード
+
+    @Column
+    private LocalDateTime scheduledPublishAt; // スケジュール公開日時
+
+    @Column
+    private LocalDateTime scheduledUnpublishAt; // スケジュール非公開日時
+
+    @Column
+    private Integer versionNumber = 1; // 現在のバージョン番号
+
+    @Column
+    private Long templateId; // 使用したテンプレートID（オプション）
+
+    @Column(columnDefinition = "TEXT")
+    private String customFields; // JSON形式のカスタムフィールド
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

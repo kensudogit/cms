@@ -1,181 +1,167 @@
-# Railway デプロイチェックリスト
+# デプロイチェックリスト
 
-## デプロイ前の確認事項
+## 📋 Railway（バックエンド）デプロイ前チェック
 
-### 1. リポジトリの準備
-- [ ] GitHubリポジトリにコードがプッシュされている
-- [ ] すべての変更がコミットされている
-- [ ] `.railwayignore` ファイルが正しく設定されている
-
-### 2. Railwayアカウントの準備
-- [ ] Railwayアカウントを作成済み
-- [ ] GitHubアカウントと連携済み
-- [ ] Railway CLIがインストールされている（オプション）
-
-### 3. データベースの準備
-- [ ] PostgreSQLデータベースサービスを4つ作成（auth, content, media, user）
-- [ ] 各データベースの接続情報をメモ
-
-### 4. 環境変数の準備
-- [ ] 本番環境用のJWT秘密鍵を生成（32文字以上）
-- [ ] 各サービスの環境変数リストを準備
-
-## デプロイ手順
-
-### ステップ1: データベースサービスの作成
-1. Railwayダッシュボードで "New Service" → "Database" → "Add PostgreSQL"
-2. 以下の4つのデータベースを作成：
-   - `cms-auth-db`
-   - `cms-content-db`
-   - `cms-media-db`
-   - `cms-user-db`
-
-### ステップ2: Auth Serviceのデプロイ
-- [ ] サービスを作成
-- [ ] Root Directory: `services/auth-service`
-- [ ] Start Command: `java -jar build/libs/auth-service.jar`
-- [ ] 環境変数を設定
-- [ ] パブリックドメインを生成
-- [ ] デプロイを実行
-
-### ステップ3: Content Serviceのデプロイ
-- [ ] サービスを作成
-- [ ] Root Directory: `services/content-service`
-- [ ] Start Command: `java -jar build/libs/content-service.jar`
-- [ ] 環境変数を設定
-- [ ] パブリックドメインを生成
-- [ ] デプロイを実行
-
-### ステップ4: Media Serviceのデプロイ
-- [ ] サービスを作成
-- [ ] Root Directory: `services/media-service`
-- [ ] Start Command: `java -jar build/libs/media-service.jar`
-- [ ] 環境変数を設定
-- [ ] パブリックドメインを生成
-- [ ] デプロイを実行
-
-### ステップ5: User Serviceのデプロイ
-- [ ] サービスを作成
-- [ ] Root Directory: `services/user-service`
-- [ ] Start Command: `java -jar build/libs/user-service.jar`
-- [ ] 環境変数を設定
-- [ ] パブリックドメインを生成
-- [ ] デプロイを実行
-
-### ステップ6: API Gatewayのデプロイ
-- [ ] サービスを作成
-- [ ] Root Directory: `services/api-gateway`
-- [ ] Start Command: `java -jar build/libs/api-gateway.jar`
-- [ ] 環境変数を設定（各サービスのURLを含む）
-- [ ] パブリックドメインを生成（**メインの公開URL**）
-- [ ] デプロイを実行
-
-### ステップ7: フロントエンドのデプロイ
-- [ ] VercelまたはRailwayでフロントエンドをデプロイ
-- [ ] 環境変数 `NEXT_PUBLIC_API_BASE_URL` を設定
-- [ ] パブリックドメインを確認
-
-## デプロイ後の確認
-
-### ヘルスチェック
-- [ ] Auth Service: `https://your-auth-url.railway.app/api/auth/health`
-- [ ] Content Service: `https://your-content-url.railway.app/api/content`
-- [ ] API Gateway: `https://your-api-gateway-url.railway.app/api/auth/health`
-
-### 機能テスト
-- [ ] ユーザー登録が動作する
-- [ ] ログインが動作する
-- [ ] コンテンツ作成が動作する
-- [ ] コンテンツ一覧が表示される
-- [ ] コンテンツ編集が動作する
-- [ ] コンテンツ削除が動作する
-
-### セキュリティ確認
-- [ ] HTTPSが有効になっている
-- [ ] CORS設定が適切
-- [ ] JWT秘密鍵が本番環境用に変更されている
-- [ ] データベース接続情報が環境変数で管理されている
-
-## トラブルシューティング
-
-### ビルドエラー
-- [ ] ログを確認
-- [ ] Java 17が使用されているか確認
-- [ ] 依存関係が正しく解決されているか確認
-
-### データベース接続エラー
-- [ ] 環境変数 `SPRING_DATASOURCE_URL` が正しく設定されているか確認
-- [ ] データベースサービスが起動しているか確認
-- [ ] 接続文字列の形式を確認
-
-### CORSエラー
-- [ ] `ALLOWED_ORIGINS` 環境変数を確認
-- [ ] フロントエンドのURLが許可されているか確認
-
-### ポートエラー
-- [ ] `PORT` 環境変数が設定されているか確認
-- [ ] Railwayが自動的に割り当てたポートを使用しているか確認
-
-## 環境変数一覧
-
-### Auth Service
-```
-SPRING_DATASOURCE_URL=${{cms-auth-db.DATABASE_URL}}
-SPRING_DATASOURCE_USERNAME=${{cms-auth-db.PGUSER}}
-SPRING_DATASOURCE_PASSWORD=${{cms-auth-db.PGPASSWORD}}
-JWT_SECRET=your-production-jwt-secret-key-change-this
-JWT_EXPIRATION=86400000
-JWT_REFRESH_EXPIRATION=604800000
-PORT=8081
-RAILWAY_ENVIRONMENT=production
-```
+### データベース作成
+- [ ] `cms-content-db` (PostgreSQL) を作成
+- [ ] `cms-auth-db` (PostgreSQL) を作成
+- [ ] `cms-user-db` (PostgreSQL) を作成
+- [ ] `cms-media-db` (PostgreSQL) を作成
 
 ### Content Service
-```
-SPRING_DATASOURCE_URL=${{cms-content-db.DATABASE_URL}}
-SPRING_DATASOURCE_USERNAME=${{cms-content-db.PGUSER}}
-SPRING_DATASOURCE_PASSWORD=${{cms-content-db.PGPASSWORD}}
-PORT=8082
-RAILWAY_ENVIRONMENT=production
-```
+- [ ] サービスを作成
+- [ ] Root Directory: `services/content-service`
+- [ ] Start Command: `java -jar build/libs/*.jar`
+- [ ] 環境変数を設定:
+  - [ ] `SPRING_DATASOURCE_URL=${{cms-content-db.DATABASE_URL}}`
+  - [ ] `SPRING_DATASOURCE_USERNAME=${{cms-content-db.PGUSER}}`
+  - [ ] `SPRING_DATASOURCE_PASSWORD=${{cms-content-db.PGPASSWORD}}`
+  - [ ] `PORT=8082`
+  - [ ] `SPRING_PROFILES_ACTIVE=railway`
+- [ ] パブリックドメインを生成
+- [ ] URLをメモ: `https://[content-service-url].railway.app`
 
-### Media Service
-```
-SPRING_DATASOURCE_URL=${{cms-media-db.DATABASE_URL}}
-SPRING_DATASOURCE_USERNAME=${{cms-media-db.PGUSER}}
-SPRING_DATASOURCE_PASSWORD=${{cms-media-db.PGPASSWORD}}
-AWS_S3_BUCKET=your-s3-bucket-name
-AWS_REGION=ap-northeast-1
-PORT=8083
-RAILWAY_ENVIRONMENT=production
-```
+### Auth Service
+- [ ] サービスを作成
+- [ ] Root Directory: `services/auth-service`
+- [ ] Start Command: `java -jar build/libs/*.jar`
+- [ ] 環境変数を設定:
+  - [ ] `SPRING_DATASOURCE_URL=${{cms-auth-db.DATABASE_URL}}`
+  - [ ] `SPRING_DATASOURCE_USERNAME=${{cms-auth-db.PGUSER}}`
+  - [ ] `SPRING_DATASOURCE_PASSWORD=${{cms-auth-db.PGPASSWORD}}`
+  - [ ] `JWT_SECRET=your-production-jwt-secret-key-min-32-chars`
+  - [ ] `JWT_EXPIRATION=86400000`
+  - [ ] `JWT_REFRESH_EXPIRATION=604800000`
+  - [ ] `PORT=8081`
+  - [ ] `SPRING_PROFILES_ACTIVE=railway`
+- [ ] パブリックドメインを生成
+- [ ] URLをメモ: `https://[auth-service-url].railway.app`
 
 ### User Service
-```
-SPRING_DATASOURCE_URL=${{cms-user-db.DATABASE_URL}}
-SPRING_DATASOURCE_USERNAME=${{cms-user-db.PGUSER}}
-SPRING_DATASOURCE_PASSWORD=${{cms-user-db.PGPASSWORD}}
-PORT=8084
-RAILWAY_ENVIRONMENT=production
-```
+- [ ] サービスを作成
+- [ ] Root Directory: `services/user-service`
+- [ ] Start Command: `java -jar build/libs/*.jar`
+- [ ] 環境変数を設定:
+  - [ ] `SPRING_DATASOURCE_URL=${{cms-user-db.DATABASE_URL}}`
+  - [ ] `SPRING_DATASOURCE_USERNAME=${{cms-user-db.PGUSER}}`
+  - [ ] `SPRING_DATASOURCE_PASSWORD=${{cms-user-db.PGPASSWORD}}`
+  - [ ] `PORT=8084`
+  - [ ] `SPRING_PROFILES_ACTIVE=railway`
+- [ ] パブリックドメインを生成
+- [ ] URLをメモ: `https://[user-service-url].railway.app`
 
-### API Gateway
-```
-AUTH_SERVICE_URL=${{auth-service.RAILWAY_PUBLIC_DOMAIN}}
-CONTENT_SERVICE_URL=${{content-service.RAILWAY_PUBLIC_DOMAIN}}
-MEDIA_SERVICE_URL=${{media-service.RAILWAY_PUBLIC_DOMAIN}}
-USER_SERVICE_URL=${{user-service.RAILWAY_PUBLIC_DOMAIN}}
-JWT_SECRET=your-production-jwt-secret-key-change-this
-ALLOWED_ORIGINS=*
-PORT=8080
-RAILWAY_ENVIRONMENT=production
-```
+### Media Service
+- [ ] サービスを作成
+- [ ] Root Directory: `services/media-service`
+- [ ] Start Command: `java -jar build/libs/*.jar`
+- [ ] 環境変数を設定:
+  - [ ] `SPRING_DATASOURCE_URL=${{cms-media-db.DATABASE_URL}}`
+  - [ ] `SPRING_DATASOURCE_USERNAME=${{cms-media-db.PGUSER}}`
+  - [ ] `SPRING_DATASOURCE_PASSWORD=${{cms-media-db.PGPASSWORD}}`
+  - [ ] `PORT=8083`
+  - [ ] `SPRING_PROFILES_ACTIVE=railway`
+- [ ] パブリックドメインを生成
+- [ ] URLをメモ: `https://[media-service-url].railway.app`
 
-### Frontend
-```
-NEXT_PUBLIC_API_BASE_URL=https://your-api-gateway-url.railway.app
-NODE_ENV=production
-```
+### API Gateway（重要）
+- [ ] サービスを作成
+- [ ] Root Directory: `services/api-gateway`
+- [ ] Start Command: `java -jar build/libs/*.jar`
+- [ ] 環境変数を設定:
+  - [ ] `AUTH_SERVICE_URL=https://[auth-service-url].railway.app`
+  - [ ] `CONTENT_SERVICE_URL=https://[content-service-url].railway.app`
+  - [ ] `MEDIA_SERVICE_URL=https://[media-service-url].railway.app`
+  - [ ] `USER_SERVICE_URL=https://[user-service-url].railway.app`
+  - [ ] `JWT_SECRET=your-production-jwt-secret-key-min-32-chars`（Auth Serviceと同じ値）
+  - [ ] `ALLOWED_ORIGINS=*`（完全公開モード）
+  - [ ] `PORT=8080`
+  - [ ] `SPRING_PROFILES_ACTIVE=railway`
+- [ ] パブリックドメインを生成
+- [ ] **URLをメモ**: `https://[api-gateway-url].railway.app`（フロントエンドで使用）
 
+## 📋 Vercel（フロントエンド）デプロイ前チェック
 
+### プロジェクト設定
+- [ ] Vercelアカウントを作成
+- [ ] GitHubリポジトリをインポート
+- [ ] Root Directory: `frontend`
+- [ ] Framework Preset: `Next.js`
 
+### 環境変数
+- [ ] `NEXT_PUBLIC_API_BASE_URL=https://[api-gateway-url].railway.app`
+- [ ] `NODE_ENV=production`
+- [ ] すべての環境（Production, Preview, Development）で有効化
+
+### デプロイ
+- [ ] デプロイを実行
+- [ ] ビルドログを確認（エラーがないか）
+- [ ] デプロイが成功することを確認
+- [ ] 生成されたURLをメモ: `https://[vercel-url].vercel.app`
+
+## 📋 デプロイ後チェック
+
+### CORS設定の更新
+- [ ] RailwayのAPI Gatewayの環境変数を更新
+- [ ] `ALLOWED_ORIGINS=https://[vercel-url].vercel.app`（または`*`のまま）
+- [ ] API Gatewayを再デプロイ
+
+### 動作確認
+- [ ] VercelのURLにアクセス
+- [ ] ブラウザの開発者ツール（F12）を開く
+- [ ] Consoleタブでエラーがないか確認
+- [ ] NetworkタブでAPIリクエストが成功しているか確認
+
+### 機能テスト
+- [ ] ログインページが表示される
+- [ ] ユーザー登録ができる
+- [ ] ログインができる
+- [ ] ダッシュボードが表示される
+- [ ] コンテンツ一覧が表示される
+- [ ] コンテンツ作成ができる
+- [ ] コンテンツ編集ができる
+- [ ] 大学管理ができる
+
+### バックエンドAPI確認
+- [ ] `curl https://[api-gateway-url].railway.app/api/content` が動作する
+- [ ] `curl https://[api-gateway-url].railway.app/api/university` が動作する
+
+## 🔒 セキュリティチェック
+
+- [ ] JWT_SECRETが32文字以上の強力な値になっている
+- [ ] データベース接続情報が環境変数で管理されている
+- [ ] 本番環境用の強力なパスワードを使用している
+- [ ] CORS設定が適切（本番環境では特定のドメインを指定することを推奨）
+- [ ] HTTPSが使用されている（VercelとRailwayが自動提供）
+
+## 📝 URLメモ
+
+### Railway URLs
+- API Gateway: `https://[api-gateway-url].railway.app`
+- Content Service: `https://[content-service-url].railway.app`
+- Auth Service: `https://[auth-service-url].railway.app`
+- User Service: `https://[user-service-url].railway.app`
+- Media Service: `https://[media-service-url].railway.app`
+
+### Vercel URL
+- Frontend: `https://[vercel-url].vercel.app`
+
+## 🆘 トラブルシューティング
+
+### CORSエラー
+- [ ] `ALLOWED_ORIGINS`が正しく設定されているか確認
+- [ ] VercelのURLが許可されているか確認
+- [ ] API Gatewayが再デプロイされているか確認
+
+### API接続エラー
+- [ ] `NEXT_PUBLIC_API_BASE_URL`が正しく設定されているか確認
+- [ ] RailwayのAPI Gatewayが起動しているか確認
+- [ ] 各サービスのログを確認
+
+### ビルドエラー
+- [ ] Vercelのビルドログを確認
+- [ ] Node.jsバージョンを確認
+- [ ] 依存関係の問題がないか確認
+
+## ✅ 完了
+
+すべてのチェック項目が完了したら、デプロイは成功です！

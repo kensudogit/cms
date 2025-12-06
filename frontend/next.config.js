@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
+  // Vercelではstandaloneモードは不要（自動最適化される）
+  // Dockerデプロイの場合はstandaloneモードを使用
+  output: process.env.VERCEL ? undefined : 'standalone',
   images: {
     unoptimized: true,
   },

@@ -2,6 +2,7 @@ package com.cms.content.controller;
 
 import com.cms.content.dto.ContentRequest;
 import com.cms.content.dto.ContentResponse;
+import com.cms.content.dto.ContentVersionResponse;
 import com.cms.content.service.ContentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +24,33 @@ public class ContentController {
         return ResponseEntity.ok(contentService.getAllContents());
     }
 
+    @GetMapping("/university/{universityId}")
+    public ResponseEntity<List<ContentResponse>> getContentsByUniversity(@PathVariable Long universityId) {
+        return ResponseEntity.ok(contentService.getContentsByUniversity(universityId));
+    }
+
     @GetMapping("/published")
     public ResponseEntity<List<ContentResponse>> getPublishedContents() {
         return ResponseEntity.ok(contentService.getPublishedContents());
+    }
+
+    @GetMapping("/published/university/{universityId}")
+    public ResponseEntity<List<ContentResponse>> getPublishedContentsByUniversity(@PathVariable Long universityId) {
+        return ResponseEntity.ok(contentService.getPublishedContentsByUniversity(universityId));
+    }
+
+    @GetMapping("/university/{universityId}/category/{categoryId}")
+    public ResponseEntity<List<ContentResponse>> getContentsByCategory(
+            @PathVariable Long universityId,
+            @PathVariable Long categoryId) {
+        return ResponseEntity.ok(contentService.getContentsByCategory(universityId, categoryId));
+    }
+
+    @GetMapping("/university/{universityId}/type/{contentType}")
+    public ResponseEntity<List<ContentResponse>> getContentsByType(
+            @PathVariable Long universityId,
+            @PathVariable String contentType) {
+        return ResponseEntity.ok(contentService.getContentsByType(universityId, contentType));
     }
 
     @GetMapping("/{id}")
@@ -36,6 +61,33 @@ public class ContentController {
     @GetMapping("/slug/{slug}")
     public ResponseEntity<ContentResponse> getContentBySlug(@PathVariable String slug) {
         return ResponseEntity.ok(contentService.getContentBySlug(slug));
+    }
+
+    @GetMapping("/university/{universityId}/slug/{slug}")
+    public ResponseEntity<ContentResponse> getContentByUniversityAndSlug(
+            @PathVariable Long universityId,
+            @PathVariable String slug) {
+        return ResponseEntity.ok(contentService.getContentByUniversityAndSlug(universityId, slug));
+    }
+
+    @GetMapping("/{id}/versions")
+    public ResponseEntity<List<ContentVersionResponse>> getContentVersions(@PathVariable Long id) {
+        return ResponseEntity.ok(contentService.getContentVersions(id));
+    }
+
+    @GetMapping("/{id}/versions/{versionNumber}")
+    public ResponseEntity<ContentVersionResponse> getContentVersion(
+            @PathVariable Long id,
+            @PathVariable Integer versionNumber) {
+        return ResponseEntity.ok(contentService.getContentVersion(id, versionNumber));
+    }
+
+    @PostMapping("/{id}/restore/{versionNumber}")
+    public ResponseEntity<ContentResponse> restoreFromVersion(
+            @PathVariable Long id,
+            @PathVariable Integer versionNumber,
+            @RequestHeader(value = "X-User-Id", defaultValue = "1") Long authorId) {
+        return ResponseEntity.ok(contentService.restoreFromVersion(id, versionNumber, authorId));
     }
 
     @PostMapping

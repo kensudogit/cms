@@ -31,32 +31,12 @@ spring:
             - Path=/api/users/**
           filters:
             - StripPrefix=1
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins: ${ALLOWED_ORIGINS:*}
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-              - PATCH
-            allowedHeaders: '*'
-            allowCredentials: true
-            maxAge: 3600
-            exposedHeaders:
-              - Authorization
-              - Content-Type
-              - X-User-Id
 
 jwt:
   secret: ${JWT_SECRET:your-secret-key-change-in-production}
+  expiration: 86400000 # 24 hours
 
 logging:
   level:
     com.cms: INFO
-    org.springframework.cloud.gateway: WARN
-
-
-
+    org.springframework.cloud.gateway: INFO

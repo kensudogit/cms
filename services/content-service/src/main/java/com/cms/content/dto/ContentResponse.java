@@ -19,6 +19,16 @@ public class ContentResponse {
     private String slug;
     private Content.Status status;
     private Long authorId;
+    private Long universityId;
+    private Long categoryId;
+    private String contentType;
+    private String metaDescription;
+    private String metaKeywords;
+    private LocalDateTime scheduledPublishAt;
+    private LocalDateTime scheduledUnpublishAt;
+    private Integer versionNumber;
+    private Long templateId;
+    private String customFields;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime publishedAt;

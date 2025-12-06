@@ -160,45 +160,51 @@ cd aws/fargate
 
 詳細は `aws/README.md` を参照してください。
 
-## Railwayデプロイ（完全公開モード）
+## 🚀 完全公開モードデプロイ
+
+### アーキテクチャ
+
+- **フロントエンド**: Vercel（Next.js）
+- **バックエンド**: Railway（Spring Boot マイクロサービス）
 
 ### クイックスタート
 
-**5分でデプロイ**: `RAILWAY_QUICK_START.md` を参照
+**5分でデプロイ**: `DEPLOY_QUICK_START.md` を参照
 
 ### 詳細手順
 
-1. **完全なデプロイ手順**: `RAILWAY_DEPLOY.md` を参照
+1. **完全なデプロイ手順**: `DEPLOYMENT_GUIDE.md` を参照
 2. **デプロイチェックリスト**: `DEPLOYMENT_CHECKLIST.md` を参照
 
-### Railway Web UIを使用（推奨）
+### デプロイ手順概要
 
-1. https://railway.app にアクセス
-2. "New Project" → "Deploy from GitHub repo"
-3. リポジトリを選択
-4. 各サービスを個別にデプロイ（詳細は `RAILWAY_DEPLOY.md` を参照）
+#### Railway（バックエンド）
 
-### Railway CLIを使用
+1. PostgreSQLデータベースを作成（各サービス用）
+2. 各マイクロサービスをデプロイ:
+   - Content Service
+   - Auth Service
+   - User Service
+   - Media Service
+   - API Gateway（重要）
+3. 各サービスのパブリックドメインを生成
+4. API GatewayのURLをメモ（フロントエンドで使用）
 
-```bash
-# CLIのインストール
-npm install -g @railway/cli
+#### Vercel（フロントエンド）
 
-# ログイン
-railway login
+1. Vercelでプロジェクトを作成
+2. Root Directory: `frontend`
+3. 環境変数を設定:
+   - `NEXT_PUBLIC_API_BASE_URL=https://[api-gateway-url].railway.app`
+4. デプロイ
 
-# プロジェクトの初期化
-railway init
+#### CORS設定
 
-# デプロイスクリプトの実行
-railway-deploy.bat  # Windows
-# または
-./railway-deploy.sh  # Linux/Mac
-```
+RailwayのAPI Gatewayで:
+- `ALLOWED_ORIGINS=*`（完全公開モード）
+- または `ALLOWED_ORIGINS=https://[vercel-url].vercel.app`（特定ドメイン）
 
-### 完全公開モードの設定
-
-各サービスの "Settings" → "Networking" → "Generate Domain" でパブリックURLを生成します。
+詳細は `DEPLOYMENT_GUIDE.md` を参照してください。
 
 ## 30パターンのWeb画面セット
 

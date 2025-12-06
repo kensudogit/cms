@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '@/store/authStore';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { ContentRequest } from '@/lib/types';
 
@@ -15,13 +15,33 @@ export default function NewContentPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const { data: universities } = useQuery({
+    queryKey: ['universities'],
+    queryFn: async () => {
+      const response = await apiClient.get('/api/university/active');
+      return response.data;
+    },
+  });
+
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      if (!watch('universityId')) return [];
+      const response = await apiClient.get(`/api/content-category/university/${watch('universityId')}`);
+      return response.data;
+    },
+    enabled: !!watch('universityId'),
+  });
+
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<ContentRequest & { status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED' }>({
     defaultValues: {
       status: 'DRAFT',
+      universityId: universities?.[0]?.id || 1,
     },
   });
 
@@ -116,6 +136,66 @@ export default function NewContentPage() {
                     {errors.title.message}
                   </p>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="universityId" className="block text-sm font-bold text-slate-700 flex items-center space-x-2">
+                  <span>大学</span>
+                  <span className="text-red-500">*</span>
+                </label>
+                <select
+                  {...register('universityId', { required: '大学を選択してください', valueAsNumber: true })}
+                  className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium cursor-pointer"
+                >
+                  {universities?.map((univ) => (
+                    <option key={univ.id} value={univ.id}>
+                      {univ.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.universityId && (
+                  <p className="text-sm text-red-600 flex items-center font-semibold mt-2">
+                    <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.universityId.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="categoryId" className="block text-sm font-bold text-slate-700">
+                  カテゴリ
+                </label>
+                <select
+                  {...register('categoryId', { valueAsNumber: true })}
+                  className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium cursor-pointer"
+                  disabled={!watch('universityId') || !categories || categories.length === 0}
+                >
+                  <option value="">カテゴリを選択（オプション）</option>
+                  {categories?.map((cat: any) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="contentType" className="block text-sm font-bold text-slate-700">
+                  コンテンツタイプ
+                </label>
+                <select
+                  {...register('contentType')}
+                  className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium cursor-pointer"
+                >
+                  <option value="">タイプを選択（オプション）</option>
+                  <option value="入学手続き">入学手続き</option>
+                  <option value="卒業手続き">卒業手続き</option>
+                  <option value="お知らせ">お知らせ</option>
+                  <option value="手続きガイド">手続きガイド</option>
+                  <option value="FAQ">FAQ</option>
+                </select>
               </div>
 
               <div className="space-y-2">
