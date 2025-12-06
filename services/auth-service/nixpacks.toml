@@ -8,5 +8,5 @@ cmds = [
 ]
 
 [phases.start]
-cmd = "cd ../.. && java -jar build/libs/auth-service.jar"
+cmd = "cd ../.. && java -jar services/auth-service/build/libs/auth-service.jar"
 

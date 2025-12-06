@@ -1,0 +1,12 @@
+[phases.setup]
+nixPkgs = ["jdk21", "gradle"]
+
+[phases.build]
+cmds = [
+  "chmod +x ../../gradlew || true",
+  "cd ../.. && ./gradlew :services:media-service:build -x test"
+]
+
+[phases.start]
+cmd = "cd ../.. && java -jar services/media-service/build/libs/media-service.jar"
+

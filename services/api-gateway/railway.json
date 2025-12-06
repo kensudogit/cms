@@ -5,7 +5,7 @@
     "buildCommand": "chmod +x ../../gradlew && cd ../.. && ./gradlew :services:api-gateway:build -x test"
   },
   "deploy": {
-    "startCommand": "java -jar ../../build/libs/api-gateway.jar",
+    "startCommand": "java -jar ../../services/api-gateway/build/libs/api-gateway.jar",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }

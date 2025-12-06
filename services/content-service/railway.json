@@ -5,7 +5,7 @@
     "buildCommand": "chmod +x ../../gradlew && cd ../.. && ./gradlew :services:content-service:build -x test"
   },
   "deploy": {
-    "startCommand": "java -jar ../../build/libs/content-service.jar",
+    "startCommand": "java -jar ../../services/content-service/build/libs/content-service.jar",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
