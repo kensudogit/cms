@@ -17,8 +17,8 @@ export default function NewContentPage() {
 
   const { data: universities } = useQuery<University[]>({
     queryKey: ['universities'],
-    queryFn: async () => {
-      const response = await apiClient.get('/api/university/active');
+    queryFn: async (): Promise<University[]> => {
+      const response = await apiClient.get<University[]>('/api/university/active');
       return response.data;
     },
   });
@@ -39,9 +39,9 @@ export default function NewContentPage() {
 
   const { data: categories } = useQuery<ContentCategory[]>({
     queryKey: ['categories', universityId],
-    queryFn: async () => {
+    queryFn: async (): Promise<ContentCategory[]> => {
       if (!universityId) return [];
-      const response = await apiClient.get(`/api/content-category/university/${universityId}`);
+      const response = await apiClient.get<ContentCategory[]>(`/api/content-category/university/${universityId}`);
       return response.data;
     },
     enabled: !!universityId,
