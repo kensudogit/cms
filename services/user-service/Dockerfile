@@ -3,9 +3,10 @@ FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 
 # Gradle Wrapperとビルドファイルをコピー
-COPY ../../gradlew ../../gradlew.bat ../../gradle ../../gradle/
-COPY ../../build.gradle ../../settings.gradle ./
-COPY ../../services ./services
+COPY gradlew gradlew.bat ./
+COPY gradle ./gradle
+COPY build.gradle settings.gradle ./
+COPY services ./services
 
 # ビルド
 RUN chmod +x gradlew && ./gradlew :services:user-service:build -x test
