@@ -122,18 +122,24 @@ Railwayダッシュボードで：
 4. **Settings** → **Dockerfile Path**: `frontend/Dockerfile`
 5. **Settings** → **Deploy** → **Generate Domain** でパブリックドメインを生成
 
-## 🔓 完全公開モードの設定
+## 🔓 完全公開モードの設定（重要）
 
 ### ステップ1: HTTP認証の無効化
+
+**重要**: RailwayにデプロイしたCMSにアクセスすると、HTTP認証のログインダイアログが表示される場合があります。これを無効化する必要があります。
 
 各サービス（フロントエンド、API Gateway）で：
 
 1. **Settings** → **Networking**
 2. **HTTP Authentication** セクションを確認
-3. 有効になっている場合は、**Disable** をクリック
-4. 関連する環境変数を削除：
+3. 有効になっている場合は、**Disable** をクリック（またはトグルをオフにする）
+4. **Variables**タブで関連する環境変数を削除：
    - `RAILWAY_HTTP_AUTH_USERNAME`
    - `RAILWAY_HTTP_AUTH_PASSWORD`
+   - `RAILWAY_HTTP_AUTH_ENABLED`
+   - その他`HTTP_AUTH`関連の環境変数
+
+**注意**: 設定を変更した後、ブラウザのキャッシュをクリアして再度アクセスしてください。
 
 ### ステップ2: パブリックドメインの確認
 
