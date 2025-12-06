@@ -16,9 +16,13 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # ビルド済みJARをコピー
-COPY --from=build /app/build/libs/api-gateway.jar app.jar
+COPY --from=build /app/services/api-gateway/build/libs/api-gateway.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Railway環境変数に対応
+ENV PORT=8080
+ENV SPRING_PROFILES_ACTIVE=railway
+
+ENTRYPOINT ["sh", "-c", "java -jar -Dserver.port=${PORT:-8080} app.jar --spring.profiles.active=railway"]
 

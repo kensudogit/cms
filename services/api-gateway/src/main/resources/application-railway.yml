@@ -41,8 +41,14 @@ spring:
               - PUT
               - DELETE
               - OPTIONS
+              - PATCH
             allowedHeaders: '*'
             allowCredentials: true
+            maxAge: 3600
+            exposedHeaders:
+              - Authorization
+              - Content-Type
+              - X-User-Id
 
 jwt:
   secret: ${JWT_SECRET:your-secret-key-change-in-production}

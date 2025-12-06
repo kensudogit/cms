@@ -1,11 +1,10 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "chmod +x ../../gradlew && cd ../.. && ./gradlew :services:api-gateway:build -x test"
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "services/api-gateway/Dockerfile"
   },
   "deploy": {
-    "startCommand": "java -jar ../../services/api-gateway/build/libs/api-gateway.jar",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
