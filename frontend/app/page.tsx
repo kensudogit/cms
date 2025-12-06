@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuthStore } from '@/store/authStore';
@@ -12,6 +14,20 @@ export default function Home() {
   const user = useAuthStore((state) => state.user);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const token = useAuthStore((state) => state.token);
+  const router = useRouter();
+
+  // 未認証の場合はログインページにリダイレクト
+  useEffect(() => {
+    if (!user && !token) {
+      router.push('/login');
+      return;
+    }
+  }, [user, token, router]);
+
+  // 未認証の場合は何も表示しない（リダイレクト中）
+  if (!user && !token) {
+    return null;
+  }
 
   // APIからデータを取得（フォールバックとしてモックデータを使用）
   const { data: contents, isLoading } = useQuery<Content[]>({
@@ -31,6 +47,7 @@ export default function Home() {
 
   const handleLogout = () => {
     clearAuth();
+    router.push('/login');
   };
 
   return (

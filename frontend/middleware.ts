@@ -2,13 +2,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // ログインページへのアクセスを完全にブロックし、ルートパス（ダッシュボード）にリダイレクト
-  if (request.nextUrl.pathname === '/login') {
-    const url = request.nextUrl.clone();
-    url.pathname = '/';
-    return NextResponse.redirect(url);
-  }
-
+  // ログインページへのアクセスは許可（リダイレクトしない）
+  
   // すべてのパスへのアクセスを許可
   const response = NextResponse.next();
   
