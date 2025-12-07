@@ -118,6 +118,15 @@ export interface ProcedureFlow {
   updatedAt: string;
 }
 
+export interface ProcedureFlowRequest {
+  universityId: number;
+  name: string;
+  description?: string;
+  flowType: string;
+  displayOrder?: number;
+  active?: boolean;
+}
+
 export interface ProcedureStep {
   id: number;
   flowId: number;
