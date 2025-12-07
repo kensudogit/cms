@@ -119,47 +119,9 @@ export default function AdmissionProcedurePage() {
     startStepMutation.mutate({ stepId, universityId: selectedUniversityId });
   };
 
-  const createPaymentMutation = useMutation({
-    mutationFn: async (data: { flowId: number; amount: number; paymentType: string }) => {
-      if (!selectedUniversityId || !userId) throw new Error('Missing required data');
-      const response = await apiClient.post('/api/payment', {
-        userId,
-        universityId: selectedUniversityId,
-        flowId: data.flowId,
-        paymentType: data.paymentType,
-        amount: data.amount,
-        currency: 'JPY',
-        status: 'PENDING',
-        paymentMethod: '銀行振込',
-      });
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payments'] });
-    },
-  });
-
   const handleCompleteStep = (stepId: number) => {
     if (!userId) return;
     completeStepMutation.mutate(stepId);
-  };
-
-  const handleCompleteStepWithPayment = async (stepId: number, flowId: number, stepName: string) => {
-    // ステップを完了
-    completeStepMutation.mutate(stepId);
-    
-    // 入学金関連のステップの場合、支払い記録を作成
-    if (stepName.includes('入学金') || stepName.includes('授業料') || stepName.includes('納付')) {
-      // 入学金の金額を設定（実際の実装では、大学やフローから取得）
-      const amount = stepName.includes('入学金') ? 282000 : stepName.includes('授業料') ? 535800 : 0;
-      if (amount > 0 && selectedUniversityId && userId) {
-        createPaymentMutation.mutate({
-          flowId,
-          amount,
-          paymentType: stepName.includes('入学金') ? '入学金' : '授業料',
-        });
-      }
-    }
   };
 
   const getStatusColor = (status?: string) => {

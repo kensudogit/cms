@@ -376,9 +376,7 @@ export default function PaymentDetailPage() {
                   </Link>
                 )}
               </div>
-              </>
-            )}
-          </div>
+            </div>
           </div>
         </div>
       </main>
