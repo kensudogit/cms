@@ -16,12 +16,32 @@ export function StepActions({ step, onStart, onComplete, isStarting, isCompletin
   const [paymentMethod, setPaymentMethod] = useState<'credit' | 'bank' | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [localStatus, setLocalStatus] = useState<'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | null>(null);
+
+  // ローカル状態とサーバー状態の統合
+  const currentStatus = localStatus || step.progressStatus;
 
   // ファイルアップロードが必要なステップかどうか
-  const isFileUploadStep = step.name.includes('願書') || step.name.includes('提出');
+  const isFileUploadStep = step.name.includes('願書') || 
+                           step.name.includes('提出') || 
+                           step.name.includes('申請書');
 
   // 決済が必要なステップかどうか
-  const isPaymentStep = step.name.includes('納付') || step.name.includes('支払い') || step.name.includes('検定料') || step.name.includes('入学金');
+  const isPaymentStep = step.name.includes('納付') || 
+                       step.name.includes('支払い') || 
+                       step.name.includes('検定料') || 
+                       step.name.includes('入学金');
+
+  // デバッグ用（開発時のみ）
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+    console.log('StepActions Debug:', {
+      stepName: step.name,
+      progressStatus: step.progressStatus,
+      canStart: step.canStart,
+      isFileUploadStep,
+      isPaymentStep,
+    });
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -40,6 +60,15 @@ export function StepActions({ step, onStart, onComplete, isStarting, isCompletin
         alert('Excel (.xlsx, .xls) または PDF (.pdf) 形式のファイルを選択してください。');
         e.target.value = '';
       }
+    }
+  };
+
+  const handleStart = async () => {
+    try {
+      await onStart();
+      setLocalStatus('IN_PROGRESS');
+    } catch (error) {
+      console.error('Start step error:', error);
     }
   };
 
@@ -65,6 +94,7 @@ export function StepActions({ step, onStart, onComplete, isStarting, isCompletin
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       alert('ファイルのアップロードが完了しました。');
+      setLocalStatus('COMPLETED');
       onComplete();
     } catch (error) {
       console.error('File upload error:', error);
@@ -87,6 +117,7 @@ export function StepActions({ step, onStart, onComplete, isStarting, isCompletin
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       alert(`${paymentMethod === 'credit' ? 'クレジットカード' : '銀行振込'}での決済が完了しました。`);
+      setLocalStatus('COMPLETED');
       onComplete();
     } catch (error) {
       console.error('Payment error:', error);
@@ -97,19 +128,19 @@ export function StepActions({ step, onStart, onComplete, isStarting, isCompletin
     }
   };
 
-  if (step.progressStatus === 'NOT_STARTED' && step.canStart) {
+  if (currentStatus === 'NOT_STARTED' && (step.canStart || localStatus === null)) {
     return (
       <button
-        onClick={onStart}
+        onClick={handleStart}
         disabled={isStarting}
         className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-all disabled:opacity-50"
       >
-        開始
+        {isStarting ? '開始中...' : '開始'}
       </button>
     );
   }
 
-  if (step.progressStatus === 'IN_PROGRESS') {
+  if (currentStatus === 'IN_PROGRESS') {
     if (isFileUploadStep) {
       return (
         <div className="space-y-4 w-full">
@@ -251,7 +282,7 @@ export function StepActions({ step, onStart, onComplete, isStarting, isCompletin
     );
   }
 
-  if (step.progressStatus === 'COMPLETED') {
+  if (currentStatus === 'COMPLETED') {
     return (
       <div className="flex items-center space-x-2">
         <svg className="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">

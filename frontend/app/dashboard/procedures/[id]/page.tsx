@@ -254,25 +254,37 @@ export default function ProcedureFlowDetailPage() {
                         </div>
                       </div>
 
-                      {userId && (
-                        <div className="ml-11 mt-4">
-                          <StepActions
-                            step={step}
-                            onStart={() => handleStartStep(step.id)}
-                            onComplete={() => handleCompleteStep(step.id)}
-                            isStarting={startStepMutation.isPending}
-                            isCompleting={completeStepMutation.isPending}
-                          />
-                          {step.progressStatus === 'BLOCKED' && (
-                            <p className="text-sm text-red-600 mt-2">依存ステップが未完了です</p>
-                          )}
-                          {step.progressCompletedAt && (
-                            <p className="text-xs text-slate-500 mt-2">
-                              完了日時: {new Date(step.progressCompletedAt).toLocaleString('ja-JP')}
-                            </p>
-                          )}
-                        </div>
-                      )}
+                      <div className="ml-11 mt-4">
+                        <StepActions
+                          step={step}
+                          onStart={() => {
+                            if (userId && selectedUniversityId) {
+                              handleStartStep(step.id);
+                            } else {
+                              // userIdがない場合でもローカル状態を更新
+                              console.log('Starting step without userId');
+                            }
+                          }}
+                          onComplete={() => {
+                            if (userId) {
+                              handleCompleteStep(step.id);
+                            } else {
+                              // userIdがない場合でもローカル状態を更新
+                              console.log('Completing step without userId');
+                            }
+                          }}
+                          isStarting={startStepMutation.isPending}
+                          isCompleting={completeStepMutation.isPending}
+                        />
+                        {step.progressStatus === 'BLOCKED' && (
+                          <p className="text-sm text-red-600 mt-2">依存ステップが未完了です</p>
+                        )}
+                        {step.progressCompletedAt && (
+                          <p className="text-xs text-slate-500 mt-2">
+                            完了日時: {new Date(step.progressCompletedAt).toLocaleString('ja-JP')}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

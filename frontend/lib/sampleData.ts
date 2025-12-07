@@ -406,7 +406,7 @@ export const createSampleProcedureFlowDetail = (flowId: number, universityId: nu
   const stepsWithProgress: ProcedureStepWithProgress[] = (flow.steps || []).map((step, index) => ({
     ...step,
     progressStatus: 'NOT_STARTED' as const,
-    canStart: index === 0, // 最初のステップのみ開始可能
+    canStart: true, // すべてのステップを開始可能にする（依存関係のチェックは別途実装）
   }));
 
   const totalSteps = stepsWithProgress.length;

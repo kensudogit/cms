@@ -377,34 +377,44 @@ export default function AdmissionProcedurePage() {
                           </div>
                         </div>
 
-                        {userId && (userRole === 'STUDENT' || userRole === 'PARENT') && (
-                          <div className="ml-13 mt-4">
-                            <StepActions
-                              step={step}
-                              onStart={() => handleStartStep(step.id)}
-                              onComplete={() => {
+                        <div className="ml-13 mt-4">
+                          <StepActions
+                            step={step}
+                            onStart={() => {
+                              if (userId && selectedUniversityId) {
+                                handleStartStep(step.id);
+                              } else {
+                                // userIdがない場合でもローカル状態を更新
+                                console.log('Starting step without userId');
+                              }
+                            }}
+                            onComplete={() => {
+                              if (userId) {
                                 // 入学金・授業料関連のステップの場合は支払い記録も作成
                                 if (step.name.includes('入学金') || step.name.includes('授業料') || step.name.includes('納付')) {
                                   handleCompleteStepWithPayment(step.id, flow.id, step.name);
                                 } else {
                                   handleCompleteStep(step.id);
                                 }
-                              }}
-                              isStarting={startStepMutation.isPending}
-                              isCompleting={completeStepMutation.isPending || createPaymentMutation.isPending}
-                            />
-                            {step.progressStatus === 'BLOCKED' && (
-                              <p className="text-sm text-red-600 font-semibold mt-2">
-                                ⚠️ 依存ステップが未完了です
-                              </p>
-                            )}
-                            {step.progressCompletedAt && (
-                              <p className="text-xs text-slate-500 mt-2">
-                                完了日時: {new Date(step.progressCompletedAt).toLocaleString('ja-JP')}
-                              </p>
-                            )}
-                          </div>
-                        )}
+                              } else {
+                                // userIdがない場合でもローカル状態を更新
+                                console.log('Completing step without userId');
+                              }
+                            }}
+                            isStarting={startStepMutation.isPending}
+                            isCompleting={completeStepMutation.isPending || createPaymentMutation.isPending}
+                          />
+                          {step.progressStatus === 'BLOCKED' && (
+                            <p className="text-sm text-red-600 font-semibold mt-2">
+                              ⚠️ 依存ステップが未完了です
+                            </p>
+                          )}
+                          {step.progressCompletedAt && (
+                            <p className="text-xs text-slate-500 mt-2">
+                              完了日時: {new Date(step.progressCompletedAt).toLocaleString('ja-JP')}
+                            </p>
+                          )}
+                        </div>
 
                         {step.progressStatus === 'COMPLETED' && (
                           <div className="ml-13 mt-2">
