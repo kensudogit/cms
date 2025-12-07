@@ -282,18 +282,32 @@ export default function DashboardPage() {
                 </Link>
               )}
               {(userRole === 'ADMIN' || userRole === 'EDITOR' || userRole === 'STAFF' || userRole === 'FACULTY') && (
-                <Link
-                  href="/dashboard/contents/new"
-                  className="group relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white px-6 py-3.5 rounded-xl text-sm font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 overflow-hidden glow-effect"
-                >
-                  <span className="relative z-10 flex items-center space-x-2">
-                    <svg className="w-5 h-5 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>新規作成</span>
-                  </span>
-                  <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
-                </Link>
+                <>
+                  <Link
+                    href="/dashboard/create-sample-contents"
+                    className="group relative bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-6 py-3.5 rounded-xl text-sm font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 overflow-hidden"
+                  >
+                    <span className="relative z-10 flex items-center space-x-2">
+                      <svg className="w-5 h-5 transform group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      <span>サンプル作成</span>
+                    </span>
+                    <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+                  </Link>
+                  <Link
+                    href="/dashboard/contents/new"
+                    className="group relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white px-6 py-3.5 rounded-xl text-sm font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 overflow-hidden glow-effect"
+                  >
+                    <span className="relative z-10 flex items-center space-x-2">
+                      <svg className="w-5 h-5 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                      </svg>
+                      <span>新規作成</span>
+                    </span>
+                    <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+                  </Link>
+                </>
               )}
             </div>
           </div>
@@ -309,74 +323,128 @@ export default function DashboardPage() {
               <p className="mt-6 text-slate-600 font-medium animate-pulse">読み込み中...</p>
             </div>
           ) : contents && contents.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {contents.map((content, index) => (
-                <Link
-                  key={content.id}
-                  href={`/dashboard/contents/${content.id}`}
-                  className="group card-hover animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <div className="glass-card rounded-3xl p-6 h-full flex flex-col transition-all duration-500 border border-white/50 hover:border-indigo-200/50 relative overflow-hidden">
-                    {/* ホバー時のグラデーションオーバーレイ */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-indigo-500/5 group-hover:via-purple-500/5 group-hover:to-pink-500/5 transition-all duration-500"></div>
-                    
-                    <div className="relative z-10 flex items-start justify-between mb-4">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-slate-800 group-hover:text-indigo-600 transition-colors line-clamp-2 mb-2 leading-tight">
-                          {content.title}
-                        </h3>
-                        {content.universityId && universities && (
-                          <p className="text-xs text-indigo-600 font-semibold mb-2">
-                            {universities.find((u: any) => u.id === content.universityId)?.name || `大学ID: ${content.universityId}`}
-                          </p>
-                        )}
-                        {content.contentType && (
-                          <p className="text-xs text-slate-500 mb-2">{content.contentType}</p>
-                        )}
-                        <span
-                          className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold shadow-sm ${
-                            content.status === 'PUBLISHED'
-                              ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-white shadow-emerald-200'
-                              : content.status === 'DRAFT'
-                              ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-amber-200'
-                              : 'bg-gradient-to-r from-slate-400 to-gray-500 text-white shadow-slate-200'
-                          }`}
-                        >
-                          <span className="w-2 h-2 rounded-full bg-white/80 mr-2 animate-pulse"></span>
-                          {content.status === 'PUBLISHED' ? '公開' : content.status === 'DRAFT' ? '下書き' : 'アーカイブ'}
-                        </span>
-                      </div>
-                      <div className="ml-4 flex-shrink-0">
-                        <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
-                          <svg className="w-6 h-6 text-white transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                          </svg>
+            (() => {
+              // コンテンツを大学IDでグループ化
+              const contentsByUniversity = contents.reduce((acc: Record<number, Content[]>, content) => {
+                const universityId = content.universityId || 0; // universityIdがない場合は0に分類
+                if (!acc[universityId]) {
+                  acc[universityId] = [];
+                }
+                acc[universityId].push(content);
+                return acc;
+              }, {});
+
+              // 大学ごとにセクションを表示
+              return (
+                <div className="space-y-8">
+                  {Object.entries(contentsByUniversity).map(([universityIdStr, universityContents]) => {
+                    const universityId = parseInt(universityIdStr);
+                    const university = universities?.find((u: any) => u.id === universityId);
+                    const universityName = university?.name || (universityId === 0 ? '大学未設定' : `大学ID: ${universityId}`);
+                    const universityCode = university?.code || '';
+
+                    return (
+                      <div key={universityId} className="animate-fade-in-up">
+                        {/* 大学ヘッダー */}
+                        <div className="mb-6 flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                              </svg>
+                            </div>
+                            <div>
+                              <h3 className="text-2xl font-bold bg-gradient-to-r from-indigo-800 to-purple-800 bg-clip-text text-transparent">
+                                {universityName}
+                              </h3>
+                              {universityCode && (
+                                <p className="text-sm text-slate-500">コード: {universityCode}</p>
+                              )}
+                              <p className="text-sm text-slate-600 mt-1">
+                                {universityContents.length}件のコンテンツ
+                              </p>
+                            </div>
+                          </div>
+                          {university && (
+                            <Link
+                              href={`/dashboard/universities/${university.id}`}
+                              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-all"
+                            >
+                              大学詳細
+                            </Link>
+                          )}
+                        </div>
+
+                        {/* コンテンツグリッド */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {universityContents.map((content, index) => (
+                            <Link
+                              key={content.id}
+                              href={`/dashboard/contents/${content.id}`}
+                              className="group card-hover animate-fade-in-up"
+                              style={{ animationDelay: `${index * 0.05}s` }}
+                            >
+                              <div className="glass-card rounded-3xl p-6 h-full flex flex-col transition-all duration-500 border border-white/50 hover:border-indigo-200/50 relative overflow-hidden">
+                                {/* ホバー時のグラデーションオーバーレイ */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-indigo-500/5 group-hover:via-purple-500/5 group-hover:to-pink-500/5 transition-all duration-500"></div>
+                                
+                                <div className="relative z-10 flex items-start justify-between mb-4">
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-lg font-bold text-slate-800 group-hover:text-indigo-600 transition-colors line-clamp-2 mb-2 leading-tight">
+                                      {content.title}
+                                    </h4>
+                                    {content.contentType && (
+                                      <p className="text-xs text-slate-500 mb-2">{content.contentType}</p>
+                                    )}
+                                    <span
+                                      className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold shadow-sm ${
+                                        content.status === 'PUBLISHED'
+                                          ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-white shadow-emerald-200'
+                                          : content.status === 'DRAFT'
+                                          ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-amber-200'
+                                          : 'bg-gradient-to-r from-slate-400 to-gray-500 text-white shadow-slate-200'
+                                      }`}
+                                    >
+                                      <span className="w-2 h-2 rounded-full bg-white/80 mr-2 animate-pulse"></span>
+                                      {content.status === 'PUBLISHED' ? '公開' : content.status === 'DRAFT' ? '下書き' : 'アーカイブ'}
+                                    </span>
+                                  </div>
+                                  <div className="ml-4 flex-shrink-0">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+                                      <svg className="w-6 h-6 text-white transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                                      </svg>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className="relative z-10 mt-auto pt-4 border-t border-slate-200/50">
+                                  <p className="text-xs text-slate-500 mb-2 truncate font-medium">
+                                    <span className="text-slate-400">スラッグ:</span> {content.slug}
+                                  </p>
+                                  <div className="flex items-center space-x-2 text-xs text-slate-400">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>
+                                      {new Date(content.updatedAt).toLocaleDateString('ja-JP', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                      })}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </Link>
+                          ))}
                         </div>
                       </div>
-                    </div>
-                    
-                    <div className="relative z-10 mt-auto pt-4 border-t border-slate-200/50">
-                      <p className="text-xs text-slate-500 mb-2 truncate font-medium">
-                        <span className="text-slate-400">スラッグ:</span> {content.slug}
-                      </p>
-                      <div className="flex items-center space-x-2 text-xs text-slate-400">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>
-                          {new Date(content.updatedAt).toLocaleDateString('ja-JP', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                    );
+                  })}
+                </div>
+              );
+            })()
           ) : (
             <div className="text-center py-20 animate-fade-in-up">
               <div className="inline-block relative mb-8">
@@ -391,15 +459,28 @@ export default function DashboardPage() {
                 コンテンツがありません
               </h3>
               <p className="text-slate-600 mb-8 text-lg font-medium">最初のコンテンツを作成して始めましょう！</p>
-              <Link
-                href="/dashboard/contents/new"
-                className="group inline-flex items-center space-x-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-xl font-bold shadow-2xl hover:shadow-indigo-500/50 transition-all duration-300 transform hover:scale-110 glow-effect"
-              >
-                <svg className="w-6 h-6 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                </svg>
-                <span>新規コンテンツを作成</span>
-              </Link>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link
+                  href="/dashboard/contents/new"
+                  className="group inline-flex items-center space-x-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-xl font-bold shadow-2xl hover:shadow-indigo-500/50 transition-all duration-300 transform hover:scale-110 glow-effect"
+                >
+                  <svg className="w-6 h-6 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>新規コンテンツを作成</span>
+                </Link>
+                {(userRole === 'ADMIN' || userRole === 'EDITOR' || userRole === 'STAFF' || userRole === 'FACULTY') && (
+                  <Link
+                    href="/dashboard/create-sample-contents"
+                    className="group inline-flex items-center space-x-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 py-4 rounded-xl font-bold shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-110"
+                  >
+                    <svg className="w-6 h-6 transform group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>サンプルコンテンツを作成</span>
+                  </Link>
+                )}
+              </div>
             </div>
           )}
         </div>
