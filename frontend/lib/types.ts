@@ -138,5 +138,116 @@ export interface ContentVersion {
   createdAt: string;
 }
 
+export interface ProcedureFlow {
+  id: number;
+  universityId: number;
+  name: string;
+  description?: string;
+  flowType: string;
+  displayOrder?: number;
+  active: boolean;
+  steps?: ProcedureStep[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProcedureFlowRequest {
+  universityId: number;
+  name: string;
+  description?: string;
+  flowType: string;
+  displayOrder?: number;
+  active?: boolean;
+}
+
+export interface ProcedureStep {
+  id: number;
+  flowId: number;
+  contentId: number;
+  name: string;
+  description?: string;
+  stepOrder: number;
+  requiredRole?: string;
+  isRequired?: boolean;
+  dependsOnStepIds?: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProcedureStepRequest {
+  flowId: number;
+  contentId: number;
+  name: string;
+  description?: string;
+  stepOrder: number;
+  requiredRole?: string;
+  isRequired?: boolean;
+  dependsOnStepIds?: string;
+  active?: boolean;
+}
+
+export interface ProcedureProgress {
+  id: number;
+  userId: number;
+  stepId: number;
+  flowId: number;
+  universityId: number;
+  status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'SKIPPED' | 'BLOCKED';
+  startedAt?: string;
+  completedAt?: string;
+  notes?: string;
+  step?: ProcedureStep;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProcedureProgressRequest {
+  userId: number;
+  stepId: number;
+  flowId: number;
+  universityId: number;
+  status?: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'SKIPPED' | 'BLOCKED';
+  notes?: string;
+}
+
+export interface ProcedureFlowDetail {
+  id: number;
+  universityId: number;
+  name: string;
+  description?: string;
+  flowType: string;
+  displayOrder?: number;
+  active: boolean;
+  steps: ProcedureStepWithProgress[];
+  totalSteps: number;
+  completedSteps: number;
+  inProgressSteps: number;
+  notStartedSteps: number;
+  completionRate: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProcedureStepWithProgress {
+  id: number;
+  flowId: number;
+  contentId: number;
+  name: string;
+  description?: string;
+  stepOrder: number;
+  requiredRole?: string;
+  isRequired?: boolean;
+  dependsOnStepIds?: string;
+  active: boolean;
+  progressStatus?: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'SKIPPED' | 'BLOCKED';
+  progressStartedAt?: string;
+  progressCompletedAt?: string;
+  progressNotes?: string;
+  canStart?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 
 

@@ -1,4 +1,4 @@
-package com.cms.auth.entity;
+package com.cms.content.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,39 +7,42 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(name = "procedure_steps")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class ProcedureStep {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String email;
+    @Column(nullable = false)
+    private Long flowId; // 手続きフローID
 
     @Column(nullable = false)
-    private String password;
+    private Long contentId; // 関連するコンテンツID
 
     @Column(nullable = false)
-    private String name;
+    private String name; // ステップ名
 
-    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "TEXT")
+    private String description; // ステップの説明
+
     @Column(nullable = false)
-    private Role role = Role.USER;
+    private Integer stepOrder; // ステップの順序（1, 2, 3...）
 
     @Column
-    private Long universityId; // 所属大学ID（学生、父兄、大学関係者用）
+    private String requiredRole; // 必要な役割（例: "STUDENT", "PARENT", "STAFF"）
 
     @Column
-    private String studentNumber; // 学生番号（学生の場合）
+    private Boolean isRequired = true; // 必須ステップかどうか
 
     @Column
-    private String relationship; // 関係性（父兄の場合: "父", "母", "保護者"など）
+    private String dependsOnStepIds; // 依存するステップID（カンマ区切り）
 
     @Column(nullable = false)
     private Boolean active = true;
@@ -60,17 +63,5 @@ public class User {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
-    public enum Role {
-        ADMIN,           // システム管理者
-        USER,            // 一般ユーザー
-        EDITOR,          // 編集者
-        STUDENT,         // 学生
-        PARENT,          // 父兄
-        STAFF,           // 大学職員
-        FACULTY          // 教員
-    }
 }
-
-
 

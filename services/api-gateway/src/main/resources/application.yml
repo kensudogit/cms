@@ -31,6 +31,24 @@ spring:
             - Path=/api/users/**
           filters:
             - StripPrefix=1
+        - id: procedure-flow-service
+          uri: ${CONTENT_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/procedure-flow/**
+          filters:
+            - StripPrefix=1
+        - id: procedure-step-service
+          uri: ${CONTENT_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/procedure-step/**
+          filters:
+            - StripPrefix=1
+        - id: procedure-progress-service
+          uri: ${CONTENT_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/procedure-progress/**
+          filters:
+            - StripPrefix=1
       globalcors:
         corsConfigurations:
           '[/**]':

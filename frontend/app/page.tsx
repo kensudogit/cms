@@ -33,24 +33,8 @@ export default function Home() {
     setHasAuth(!!(user || token || hasStoredAuth));
   }, [user, token, router]);
 
-  // サーバー側レンダリング時は何も表示しない（ハイドレーションエラーを防ぐ）
-  if (!isClient) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600"></div>
-          <p className="mt-4 text-slate-600">読み込み中...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // 未認証の場合は何も表示しない（リダイレクト中）
-  if (!hasAuth) {
-    return null;
-  }
-
   // APIからデータを取得（フォールバックとしてモックデータを使用）
+  // すべてのフックは条件分岐の前に呼び出す必要がある
   const { data: contents, isLoading } = useQuery<Content[]>({
     queryKey: ['contents'],
     queryFn: async () => {
@@ -71,9 +55,27 @@ export default function Home() {
         return getMockContents();
       }
     },
+    enabled: isClient && hasAuth, // クライアント側で認証済みの場合のみ実行
     retry: false, // 接続エラーの場合はリトライしない
     refetchOnWindowFocus: false, // ウィンドウフォーカス時の自動再取得を無効化
   });
+
+  // サーバー側レンダリング時は何も表示しない（ハイドレーションエラーを防ぐ）
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600"></div>
+          <p className="mt-4 text-slate-600">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 未認証の場合は何も表示しない（リダイレクト中）
+  if (!hasAuth) {
+    return null;
+  }
 
   const handleLogout = () => {
     clearAuth();

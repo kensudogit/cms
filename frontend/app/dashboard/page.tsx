@@ -8,13 +8,15 @@ import { useAuthStore } from '@/store/authStore';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { Content } from '@/lib/types';
-import { getMockContents } from '@/lib/mockData';
+import { allUniversityContents } from '@/lib/universityMockData';
 
 export default function DashboardPage() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const token = useAuthStore((state) => state.token);
+  const userId = useAuthStore((state) => state.userId);
+  const userRole = user?.role || 'USER';
 
   // ログインチェックを一時的に無効化
   // useEffect(() => {
@@ -23,20 +25,59 @@ export default function DashboardPage() {
   //   }
   // }, [router, token]);
 
-  // APIからデータを取得（フォールバックとしてモックデータを使用）
-  const { data: contents, isLoading } = useQuery<Content[]>({
-    queryKey: ['contents'],
+  // 大学一覧を取得
+  const { data: universities } = useQuery({
+    queryKey: ['universities'],
     queryFn: async () => {
       try {
-        // APIからコンテンツ一覧を取得
-        const response = await apiClient.get('/api/content');
+        const response = await apiClient.get('/api/university/active');
         return response.data;
       } catch (error) {
-        // APIが失敗した場合、モックデータをフォールバックとして使用
-        console.warn('API request failed, using mock data:', error);
-        return getMockContents();
+        console.warn('Failed to fetch universities:', error);
+        return [];
       }
     },
+  });
+
+  // APIから各大学のコンテンツを取得
+  const { data: contents, isLoading } = useQuery<Content[]>({
+    queryKey: ['contents', universities],
+    queryFn: async () => {
+      try {
+        // 全コンテンツを取得（大学IDでフィルタリング可能）
+        const response = await apiClient.get('/api/content');
+        const allContents = response.data || [];
+        
+        // 大学に関連するコンテンツのみを返す（universityIdが設定されているもの）
+        const universityContents = allContents.filter((content: Content) => content.universityId != null);
+        
+        // 大学に関連するコンテンツがある場合はそれを返す、なければ全コンテンツを返す
+        const result = universityContents.length > 0 ? universityContents : allContents;
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Fetched contents:', result.length, 'items');
+        }
+        
+        return result;
+      } catch (error: any) {
+        // APIが失敗した場合、エラーログを出力
+        if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('API接続エラー: バックエンドサーバーが起動していない可能性があります。');
+          }
+        } else {
+          console.warn('API request failed:', error);
+        }
+        // APIが失敗した場合、大学関連のモックデータをフォールバックとして使用
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Using university mock data as fallback:', allUniversityContents.length, 'items');
+        }
+        return allUniversityContents;
+      }
+    },
+    enabled: true, // 常に有効
+    retry: false, // 接続エラーの場合はリトライしない
+    refetchOnWindowFocus: false, // ウィンドウフォーカス時の自動再取得を無効化
   });
 
   const handleLogout = () => {
@@ -79,6 +120,14 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              {(userRole === 'ADMIN' || userRole === 'EDITOR') && (
+                <Link
+                  href="/dashboard/implementation-check"
+                  className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg text-sm font-bold shadow-lg hover:shadow-xl transition-all"
+                >
+                  📊 実装確認
+                </Link>
+              )}
               <div className="hidden sm:flex items-center space-x-3 glass-card px-5 py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
                 <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/50">
                   <span className="text-white text-sm font-bold">
@@ -113,25 +162,95 @@ export default function DashboardPage() {
 
       <main className="relative max-w-7xl mx-auto py-8 sm:px-6 lg:px-8 animate-fade-in">
         <div className="px-4 py-6 sm:px-0">
+          {/* 役割別ダッシュボード */}
+          {(userRole === 'STUDENT' || userRole === 'PARENT') && (
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-800 via-indigo-800 to-purple-800 bg-clip-text text-transparent mb-2">
+                    {userRole === 'STUDENT' ? '学生ダッシュボード' : '父兄ダッシュボード'}
+                  </h2>
+                  <p className="text-slate-600 font-medium">手続きの進行状況を確認できます</p>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Link
+                    href="/dashboard/procedures/admission"
+                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-lg hover:shadow-xl transition-all"
+                  >
+                    入学手続きを開始
+                  </Link>
+                  <Link
+                    href="/dashboard/procedures"
+                    className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-lg hover:shadow-xl transition-all"
+                  >
+                    手続きフロー一覧
+                  </Link>
+                </div>
+              </div>
+
+              {procedureFlows && procedureFlows.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                  {procedureFlows.map((flow: any) => {
+                    const progress = procedureProgress?.filter((p: any) => p.flowId === flow.id) || [];
+                    const completed = progress.filter((p: any) => p.status === 'COMPLETED').length;
+                    const total = flow.steps?.length || 0;
+                    const completionRate = total > 0 ? (completed / total) * 100 : 0;
+
+                    return (
+                      <Link
+                        key={flow.id}
+                        href={`/dashboard/procedures/${flow.id}`}
+                        className="glass-card rounded-2xl p-6 border border-white/50 hover:border-indigo-200/50 transition-all"
+                      >
+                        <h3 className="text-lg font-bold text-slate-800 mb-3">{flow.name}</h3>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-slate-600">進捗状況</span>
+                            <span className="font-bold text-indigo-600">{completionRate.toFixed(0)}%</span>
+                          </div>
+                          <div className="w-full bg-slate-200 rounded-full h-2">
+                            <div
+                              className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full transition-all"
+                              style={{ width: `${completionRate}%` }}
+                            ></div>
+                          </div>
+                          <p className="text-xs text-slate-500">
+                            {completed} / {total} ステップ完了
+                          </p>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
             <div className="space-y-2">
               <h2 className="text-4xl font-bold bg-gradient-to-r from-slate-800 via-indigo-800 to-purple-800 bg-clip-text text-transparent">
-                コンテンツ管理
+                {userRole === 'STUDENT' || userRole === 'PARENT' ? '関連コンテンツ' : 'コンテンツ管理'}
               </h2>
-              <p className="text-slate-600 font-medium">コンテンツを管理・編集できます</p>
+              <p className="text-slate-600 font-medium">
+                {userRole === 'STUDENT' || userRole === 'PARENT' 
+                  ? '手続きに関連するコンテンツを確認できます' 
+                  : 'コンテンツを管理・編集できます'}
+              </p>
             </div>
-            <Link
-              href="/dashboard/contents/new"
-              className="group relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white px-6 py-3.5 rounded-xl text-sm font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 overflow-hidden glow-effect"
-            >
-              <span className="relative z-10 flex items-center space-x-2">
-                <svg className="w-5 h-5 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                </svg>
-                <span>新規作成</span>
-              </span>
-              <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
-            </Link>
+            {(userRole === 'ADMIN' || userRole === 'EDITOR' || userRole === 'STAFF' || userRole === 'FACULTY') && (
+              <Link
+                href="/dashboard/contents/new"
+                className="group relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white px-6 py-3.5 rounded-xl text-sm font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 overflow-hidden glow-effect"
+              >
+                <span className="relative z-10 flex items-center space-x-2">
+                  <svg className="w-5 h-5 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>新規作成</span>
+                </span>
+                <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+              </Link>
+            )}
           </div>
 
           {isLoading ? (
@@ -159,9 +278,17 @@ export default function DashboardPage() {
                     
                     <div className="relative z-10 flex items-start justify-between mb-4">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-slate-800 group-hover:text-indigo-600 transition-colors line-clamp-2 mb-3 leading-tight">
+                        <h3 className="text-lg font-bold text-slate-800 group-hover:text-indigo-600 transition-colors line-clamp-2 mb-2 leading-tight">
                           {content.title}
                         </h3>
+                        {content.universityId && universities && (
+                          <p className="text-xs text-indigo-600 font-semibold mb-2">
+                            {universities.find((u: any) => u.id === content.universityId)?.name || `大学ID: ${content.universityId}`}
+                          </p>
+                        )}
+                        {content.contentType && (
+                          <p className="text-xs text-slate-500 mb-2">{content.contentType}</p>
+                        )}
                         <span
                           className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold shadow-sm ${
                             content.status === 'PUBLISHED'
