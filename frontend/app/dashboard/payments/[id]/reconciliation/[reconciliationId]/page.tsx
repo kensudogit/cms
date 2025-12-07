@@ -49,7 +49,7 @@ export default function ReconciliationEditPage() {
       reconciledAmount: reconciliation?.reconciledAmount || payment?.amount || 0,
       status: reconciliation?.status || 'PENDING',
       reconciliationMethod: reconciliation?.reconciliationMethod || '手動',
-      reconciledBy: reconciliation?.reconciledBy || reconciledBy || undefined,
+      reconciledBy: reconciliation?.reconciledBy != null ? reconciliation.reconciledBy : (reconciledBy != null ? reconciledBy : undefined),
       notes: reconciliation?.notes || '',
     },
   });
@@ -63,7 +63,7 @@ export default function ReconciliationEditPage() {
         reconciledAmount: reconciliation.reconciledAmount,
         status: reconciliation.status,
         reconciliationMethod: reconciliation.reconciliationMethod || '手動',
-        reconciledBy: reconciliation.reconciledBy || reconciledBy,
+        reconciledBy: reconciliation.reconciledBy != null ? reconciliation.reconciledBy : (reconciledBy != null ? reconciledBy : undefined),
         notes: reconciliation.notes || '',
       });
     }
