@@ -253,39 +253,6 @@ export default function PaymentDetailPage() {
                 )}
             </div>
 
-            {payment.reconciliation && (
-                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-200/50 mb-6">
-                  <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center">
-                    <svg className="w-6 h-6 text-emerald-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    消込情報
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-xs text-slate-500 mb-1">消込金額</p>
-                      <p className="text-lg font-bold text-emerald-600">
-                        {formatCurrency(payment.reconciliation.reconciledAmount, payment.currency)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-500 mb-1">消込状況</p>
-                      <p className="text-sm font-bold text-slate-800">
-                        {payment.reconciliation.status === 'COMPLETED' ? '消込完了' : '未消込'}
-                      </p>
-                    </div>
-                    {payment.reconciliation.reconciledAt && (
-                      <div>
-                        <p className="text-xs text-slate-500 mb-1">消込日時</p>
-                        <p className="text-sm font-bold text-slate-800">
-                          {new Date(payment.reconciliation.reconciledAt).toLocaleString('ja-JP')}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-            )}
-
             {payment.notes && (
                 <div className="bg-slate-50 rounded-xl p-4 mb-6">
                   <p className="text-xs text-slate-500 mb-2 font-semibold">備考</p>
@@ -378,7 +345,6 @@ export default function PaymentDetailPage() {
               </div>
             </div>
           </div>
-        </div>
       </main>
     </div>
   );
