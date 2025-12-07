@@ -28,17 +28,25 @@ export default function ProceduresPage() {
   const { data: flows, isLoading } = useQuery<ProcedureFlow[]>({
     queryKey: ['procedure-flows', selectedUniversityId],
     queryFn: async () => {
-      if (!selectedUniversityId) return [];
+      // 大学が選択されていない場合、すべてのサンプルデータを返す
+      if (!selectedUniversityId) {
+        return sampleProcedureFlows;
+      }
       try {
         const response = await apiClient.get(`/api/procedure-flow/university/${selectedUniversityId}`);
-        return response.data || [];
+        const apiFlows = response.data || [];
+        // APIからデータが取得できない場合、サンプルデータを返す
+        if (apiFlows.length === 0) {
+          return sampleProcedureFlows.filter(f => f.universityId === selectedUniversityId);
+        }
+        return apiFlows;
       } catch (error) {
         console.warn('Failed to fetch flows, using sample data:', error);
         // 選択された大学のサンプルデータを返す
         return sampleProcedureFlows.filter(f => f.universityId === selectedUniversityId);
       }
     },
-    enabled: !!selectedUniversityId,
+    enabled: true, // 常に有効にしてサンプルデータを表示
   });
 
   return (
@@ -154,7 +162,7 @@ export default function ProceduresPage() {
                 </Link>
               ))}
             </div>
-          ) : selectedUniversityId ? (
+          ) : (
             <div className="text-center py-20">
               <h3 className="text-3xl font-bold text-slate-800 mb-3">手続きフローがありません</h3>
               <p className="text-slate-600 mb-8">最初の手続きフローを作成して始めましょう！</p>
@@ -167,40 +175,6 @@ export default function ProceduresPage() {
                 </svg>
                 <span>新規フローを作成</span>
               </Link>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
-                <p className="text-blue-800 font-semibold mb-2">💡 サンプルデータを表示中</p>
-                <p className="text-blue-700 text-sm">大学を選択すると、その大学の手続きフローが表示されます。以下はサンプルデータです。</p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sampleProcedureFlows.map((flow, index) => (
-                  <div
-                    key={flow.id}
-                    className="glass-card rounded-3xl p-6 border border-white/50 hover:border-indigo-200/50 transition-all duration-300 animate-fade-in-up"
-                    style={{ animationDelay: `${index * 0.05}s` }}
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">{flow.name}</h3>
-                        {flow.description && (
-                          <p className="text-sm text-slate-600 line-clamp-2 mb-3">{flow.description}</p>
-                        )}
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
-                          {flow.flowType}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="mt-auto pt-4 border-t border-slate-200/50">
-                      <div className="flex items-center justify-between text-sm text-slate-500">
-                        <span>ステップ数: {flow.steps?.length || 0}</span>
-                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">サンプル</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           )}
         </div>
