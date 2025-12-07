@@ -5,18 +5,23 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
-import { ProcedureFlow } from '@/lib/types';
-import { sampleProcedureFlows } from '@/lib/sampleData';
+import { ProcedureFlow, University } from '@/lib/types';
+import { sampleProcedureFlows, sampleUniversities } from '@/lib/sampleData';
 
 export default function ProceduresPage() {
   const router = useRouter();
   const [selectedUniversityId, setSelectedUniversityId] = useState<number | null>(null);
 
-  const { data: universities } = useQuery({
+  const { data: universities } = useQuery<University[]>({
     queryKey: ['universities'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/university/active');
-      return response.data;
+      try {
+        const response = await apiClient.get('/api/university/active');
+        return response.data || [];
+      } catch (error) {
+        console.warn('Failed to fetch universities, using sample data:', error);
+        return sampleUniversities;
+      }
     },
   });
 
@@ -101,9 +106,9 @@ export default function ProceduresPage() {
               className="block w-full max-w-md border-2 border-slate-200 rounded-xl shadow-sm py-3 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium cursor-pointer"
             >
               <option value="">大学を選択してください</option>
-              {universities?.map((univ: any) => (
+              {(universities && universities.length > 0 ? universities : sampleUniversities).map((univ: University) => (
                 <option key={univ.id} value={univ.id}>
-                  {univ.name}
+                  {univ.name} {!universities || universities.length === 0 ? '(サンプル)' : ''}
                 </option>
               ))}
             </select>
