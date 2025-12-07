@@ -95,13 +95,13 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
             <div className="flex items-center space-x-4">
-              <div className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg sm:rounded-xl shadow-lg transform hover:scale-110 transition-transform duration-300">
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full shadow-xl overflow-hidden">
                 <Image
                   src="/PC.png"
                   alt="CMS Logo"
-                  width={56}
-                  height={56}
-                  className="object-contain w-full h-full"
+                  width={112}
+                  height={112}
+                  className="object-contain w-full h-full logo-shake"
                   priority
                   unoptimized
                 />

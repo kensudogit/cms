@@ -41,6 +41,44 @@ body {
       inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
   }
   
+  /* ロゴ揺れアニメーション */
+  @keyframes logo-shake {
+    0%, 100% {
+      transform: rotate(0deg) translateX(0);
+    }
+    10% {
+      transform: rotate(-5deg) translateX(-2px);
+    }
+    20% {
+      transform: rotate(5deg) translateX(2px);
+    }
+    30% {
+      transform: rotate(-3deg) translateX(-1px);
+    }
+    40% {
+      transform: rotate(3deg) translateX(1px);
+    }
+    50% {
+      transform: rotate(-2deg) translateX(-1px);
+    }
+    60% {
+      transform: rotate(2deg) translateX(1px);
+    }
+    70% {
+      transform: rotate(-1deg) translateX(0);
+    }
+    80% {
+      transform: rotate(1deg) translateX(0);
+    }
+    90% {
+      transform: rotate(0deg) translateX(0);
+    }
+  }
+
+  .logo-shake {
+    animation: logo-shake 3s ease-in-out infinite;
+  }
+
   /* グラデーションテキスト */
   .gradient-text {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
