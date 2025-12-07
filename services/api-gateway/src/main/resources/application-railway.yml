@@ -49,6 +49,18 @@ spring:
             - Path=/api/procedure-progress/**
           filters:
             - StripPrefix=1
+        - id: payment-service
+          uri: ${CONTENT_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/payment/**
+          filters:
+            - StripPrefix=1
+        - id: payment-reconciliation-service
+          uri: ${CONTENT_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/payment-reconciliation/**
+          filters:
+            - StripPrefix=1
 
 jwt:
   secret: ${JWT_SECRET:your-secret-key-change-in-production}

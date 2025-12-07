@@ -249,5 +249,62 @@ export interface ProcedureStepWithProgress {
   updatedAt: string;
 }
 
+export interface Payment {
+  id: number;
+  userId: number;
+  universityId: number;
+  flowId: number;
+  paymentType: string;
+  amount: number;
+  currency: string;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'REFUNDED' | 'CANCELLED';
+  paymentMethod?: string;
+  transactionId?: string;
+  paidAt?: string;
+  notes?: string;
+  reconciliation?: PaymentReconciliation;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaymentRequest {
+  userId: number;
+  universityId: number;
+  flowId: number;
+  paymentType: string;
+  amount: number;
+  currency?: string;
+  status?: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'REFUNDED' | 'CANCELLED';
+  paymentMethod?: string;
+  transactionId?: string;
+  notes?: string;
+}
+
+export interface PaymentReconciliation {
+  id: number;
+  paymentId: number;
+  userId: number;
+  universityId: number;
+  reconciledAmount: number;
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
+  reconciliationMethod?: string;
+  reconciledAt?: string;
+  reconciledBy?: number;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaymentReconciliationRequest {
+  paymentId: number;
+  userId: number;
+  universityId: number;
+  reconciledAmount: number;
+  status?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
+  reconciliationMethod?: string;
+  reconciledBy?: number;
+  notes?: string;
+}
+
 
 

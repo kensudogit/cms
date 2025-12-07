@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useAuthStore } from '@/store/authStore';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
-import { Content } from '@/lib/types';
+import { Content, ProcedureFlow, ProcedureProgress } from '@/lib/types';
 import { allUniversityContents } from '@/lib/universityMockData';
 
 export default function DashboardPage() {
@@ -78,6 +78,41 @@ export default function DashboardPage() {
     enabled: true, // 常に有効
     retry: false, // 接続エラーの場合はリトライしない
     refetchOnWindowFocus: false, // ウィンドウフォーカス時の自動再取得を無効化
+  });
+
+  // 手続きフローを取得（学生・父兄向け）
+  const { data: procedureFlows } = useQuery<ProcedureFlow[]>({
+    queryKey: ['procedure-flows', userId],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/api/procedure-flow');
+        return response.data || [];
+      } catch (error) {
+        console.warn('Failed to fetch procedure flows:', error);
+        return [];
+      }
+    },
+    enabled: !!(userId && (userRole === 'STUDENT' || userRole === 'PARENT')),
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  // 手続き進捗を取得（学生・父兄向け）
+  const { data: procedureProgress } = useQuery<ProcedureProgress[]>({
+    queryKey: ['procedure-progress', userId],
+    queryFn: async () => {
+      try {
+        if (!userId) return [];
+        const response = await apiClient.get(`/api/procedure-progress/user/${userId}`);
+        return response.data || [];
+      } catch (error) {
+        console.warn('Failed to fetch procedure progress:', error);
+        return [];
+      }
+    },
+    enabled: !!(userId && (userRole === 'STUDENT' || userRole === 'PARENT')),
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   const handleLogout = () => {
@@ -237,20 +272,30 @@ export default function DashboardPage() {
                   : 'コンテンツを管理・編集できます'}
               </p>
             </div>
-            {(userRole === 'ADMIN' || userRole === 'EDITOR' || userRole === 'STAFF' || userRole === 'FACULTY') && (
-              <Link
-                href="/dashboard/contents/new"
-                className="group relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white px-6 py-3.5 rounded-xl text-sm font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 overflow-hidden glow-effect"
-              >
-                <span className="relative z-10 flex items-center space-x-2">
-                  <svg className="w-5 h-5 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                  </svg>
-                  <span>新規作成</span>
-                </span>
-                <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
-              </Link>
-            )}
+            <div className="flex items-center space-x-3">
+              {(userRole === 'STUDENT' || userRole === 'PARENT') && (
+                <Link
+                  href="/dashboard/payments"
+                  className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl text-sm font-bold shadow-lg hover:shadow-xl transition-all"
+                >
+                  💰 支払い管理
+                </Link>
+              )}
+              {(userRole === 'ADMIN' || userRole === 'EDITOR' || userRole === 'STAFF' || userRole === 'FACULTY') && (
+                <Link
+                  href="/dashboard/contents/new"
+                  className="group relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white px-6 py-3.5 rounded-xl text-sm font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 overflow-hidden glow-effect"
+                >
+                  <span className="relative z-10 flex items-center space-x-2">
+                    <svg className="w-5 h-5 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>新規作成</span>
+                  </span>
+                  <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+                </Link>
+              )}
+            </div>
           </div>
 
           {isLoading ? (

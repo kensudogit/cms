@@ -76,14 +76,90 @@ export default function AdmissionProcedurePage() {
     },
   });
 
+  const createPaymentMutation = useMutation({
+    mutationFn: async (data: { flowId: number; amount: number; paymentType: string }) => {
+      if (!selectedUniversityId || !userId) throw new Error('Missing required data');
+      const response = await apiClient.post('/api/payment', {
+        userId,
+        universityId: selectedUniversityId,
+        flowId: data.flowId,
+        paymentType: data.paymentType,
+        amount: data.amount,
+        currency: 'JPY',
+        status: 'PENDING',
+        paymentMethod: '銀行振込',
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payments'] });
+    },
+  });
+
+  const handleCompleteStepWithPayment = async (stepId: number, flowId: number, stepName: string) => {
+    // ステップを完了
+    await completeStepMutation.mutateAsync(stepId);
+    
+    // 入学金関連のステップの場合、支払い記録を作成
+    if (stepName.includes('入学金') || stepName.includes('授業料') || stepName.includes('納付')) {
+      // 入学金の金額を設定（実際の実装では、大学やフローから取得）
+      const amount = stepName.includes('入学金') ? 282000 : stepName.includes('授業料') ? 535800 : 0;
+      if (amount > 0) {
+        createPaymentMutation.mutate({
+          flowId,
+          amount,
+          paymentType: stepName.includes('入学金') ? '入学金' : '授業料',
+        });
+      }
+    }
+  };
+
   const handleStartStep = (stepId: number) => {
     if (!selectedUniversityId || !userId) return;
     startStepMutation.mutate({ stepId, universityId: selectedUniversityId });
   };
 
+  const createPaymentMutation = useMutation({
+    mutationFn: async (data: { flowId: number; amount: number; paymentType: string }) => {
+      if (!selectedUniversityId || !userId) throw new Error('Missing required data');
+      const response = await apiClient.post('/api/payment', {
+        userId,
+        universityId: selectedUniversityId,
+        flowId: data.flowId,
+        paymentType: data.paymentType,
+        amount: data.amount,
+        currency: 'JPY',
+        status: 'PENDING',
+        paymentMethod: '銀行振込',
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payments'] });
+    },
+  });
+
   const handleCompleteStep = (stepId: number) => {
     if (!userId) return;
     completeStepMutation.mutate(stepId);
+  };
+
+  const handleCompleteStepWithPayment = async (stepId: number, flowId: number, stepName: string) => {
+    // ステップを完了
+    completeStepMutation.mutate(stepId);
+    
+    // 入学金関連のステップの場合、支払い記録を作成
+    if (stepName.includes('入学金') || stepName.includes('授業料') || stepName.includes('納付')) {
+      // 入学金の金額を設定（実際の実装では、大学やフローから取得）
+      const amount = stepName.includes('入学金') ? 282000 : stepName.includes('授業料') ? 535800 : 0;
+      if (amount > 0 && selectedUniversityId && userId) {
+        createPaymentMutation.mutate({
+          flowId,
+          amount,
+          paymentType: stepName.includes('入学金') ? '入学金' : '授業料',
+        });
+      }
+    }
   };
 
   const getStatusColor = (status?: string) => {
@@ -304,11 +380,18 @@ export default function AdmissionProcedurePage() {
                             )}
                             {step.progressStatus === 'IN_PROGRESS' && (
                               <button
-                                onClick={() => handleCompleteStep(step.id)}
-                                disabled={completeStepMutation.isPending}
+                                onClick={() => {
+                                  // 入学金・授業料関連のステップの場合は支払い記録も作成
+                                  if (step.name.includes('入学金') || step.name.includes('授業料') || step.name.includes('納付')) {
+                                    handleCompleteStepWithPayment(step.id, flow.id, step.name);
+                                  } else {
+                                    handleCompleteStep(step.id);
+                                  }
+                                }}
+                                disabled={completeStepMutation.isPending || createPaymentMutation.isPending}
                                 className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition-all disabled:opacity-50 shadow-md hover:shadow-lg"
                               >
-                                完了
+                                {completeStepMutation.isPending || createPaymentMutation.isPending ? '処理中...' : '完了'}
                               </button>
                             )}
                             {step.progressStatus === 'BLOCKED' && (

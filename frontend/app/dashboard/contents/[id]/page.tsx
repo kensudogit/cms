@@ -8,6 +8,7 @@ import { useAuthStore } from '@/store/authStore';
 import apiClient from '@/lib/api';
 import { Content, ContentRequest } from '@/lib/types';
 import { getMockContentById } from '@/lib/mockData';
+import { allUniversityContents } from '@/lib/universityMockData';
 
 export default function ContentDetailPage() {
   const router = useRouter();
@@ -28,6 +29,13 @@ export default function ContentDetailPage() {
       } catch (error: any) {
         // APIが失敗した場合、モックデータをフォールバックとして使用
         console.warn('API request failed, using mock data:', error);
+        // まず大学関連のモックデータから検索
+        const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+        const universityContent = allUniversityContents.find((c) => c.id === numericId);
+        if (universityContent) {
+          return universityContent;
+        }
+        // 次に一般的なモックデータから検索
         const mockContent = getMockContentById(id);
         if (mockContent) {
           return mockContent;
@@ -355,13 +363,37 @@ export default function ContentDetailPage() {
                       {content.status === 'PUBLISHED' ? '公開' : content.status === 'DRAFT' ? '下書き' : 'アーカイブ'}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-4 text-sm text-slate-600">
+                  <div className="flex items-center flex-wrap gap-3 text-sm text-slate-600">
                     <div className="flex items-center space-x-2 bg-slate-100/50 px-3 py-1.5 rounded-lg">
                       <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                       </svg>
                       <span className="font-medium">{content.slug}</span>
                     </div>
+                    {content.universityId && (
+                      <div className="flex items-center space-x-2 bg-indigo-100/50 px-3 py-1.5 rounded-lg">
+                        <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        <span className="font-medium text-indigo-700">大学ID: {content.universityId}</span>
+                      </div>
+                    )}
+                    {content.contentType && (
+                      <div className="flex items-center space-x-2 bg-purple-100/50 px-3 py-1.5 rounded-lg">
+                        <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                        <span className="font-medium text-purple-700">{content.contentType}</span>
+                      </div>
+                    )}
+                    {content.metaDescription && (
+                      <div className="flex items-center space-x-2 bg-emerald-100/50 px-3 py-1.5 rounded-lg">
+                        <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="font-medium text-emerald-700">{content.metaDescription}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 

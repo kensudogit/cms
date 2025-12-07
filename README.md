@@ -167,14 +167,18 @@ cd aws/fargate
 - **フロントエンド**: Vercel（Next.js）
 - **バックエンド**: Railway（Spring Boot マイクロサービス）
 
+### ⭐ 今すぐデプロイ
+
+**ステップバイステップガイド**: [DEPLOY_NOW.md](./DEPLOY_NOW.md) を参照してください
+
 ### クイックスタート
 
-**5分でデプロイ**: `DEPLOY_QUICK_START.md` を参照
+**5分でデプロイ**: [QUICK_DEPLOY.md](./QUICK_DEPLOY.md) を参照
 
 ### 詳細手順
 
-1. **完全なデプロイ手順**: `DEPLOYMENT_GUIDE.md` を参照
-2. **デプロイチェックリスト**: `DEPLOYMENT_CHECKLIST.md` を参照
+1. **完全なデプロイ手順**: [DEPLOYMENT_COMPLETE_GUIDE.md](./DEPLOYMENT_COMPLETE_GUIDE.md) を参照
+2. **デプロイチェックリスト**: [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) を参照
 
 ### デプロイ手順概要
 
@@ -204,7 +208,7 @@ RailwayのAPI Gatewayで:
 - `ALLOWED_ORIGINS=*`（完全公開モード）
 - または `ALLOWED_ORIGINS=https://[vercel-url].vercel.app`（特定ドメイン）
 
-詳細は `DEPLOYMENT_GUIDE.md` を参照してください。
+詳細は [DEPLOY_NOW.md](./DEPLOY_NOW.md) を参照してください。
 
 ## 30パターンのWeb画面セット
 
