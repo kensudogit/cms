@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { Content, ProcedureFlow, ProcedureProgress } from '@/lib/types';
 import { allUniversityContents } from '@/lib/universityMockData';
+import { sampleContents } from '@/lib/sampleData';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -68,11 +69,12 @@ export default function DashboardPage() {
         } else {
           console.warn('API request failed:', error);
         }
-        // APIが失敗した場合、大学関連のモックデータをフォールバックとして使用
+        // APIが失敗した場合、サンプルデータとモックデータをフォールバックとして使用
         if (process.env.NODE_ENV === 'development') {
-          console.warn('Using university mock data as fallback:', allUniversityContents.length, 'items');
+          console.warn('Using sample data as fallback');
         }
-        return allUniversityContents;
+        // サンプルデータとモックデータを結合
+        return [...sampleContents, ...allUniversityContents];
       }
     },
     enabled: true, // 常に有効

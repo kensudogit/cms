@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { University } from '@/lib/types';
+import { sampleUniversities } from '@/lib/sampleData';
 
 export default function UniversitiesPage() {
   const router = useRouter();
@@ -15,8 +16,13 @@ export default function UniversitiesPage() {
   const { data: universities, isLoading } = useQuery<University[]>({
     queryKey: ['universities'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/university');
-      return response.data;
+      try {
+        const response = await apiClient.get('/api/university');
+        return response.data || [];
+      } catch (error) {
+        console.warn('Failed to fetch universities, using sample data:', error);
+        return sampleUniversities;
+      }
     },
   });
 

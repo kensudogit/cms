@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/authStore';
 import apiClient from '@/lib/api';
 import { Payment, University } from '@/lib/types';
+import { samplePayments } from '@/lib/sampleData';
 
 export default function PaymentsPage() {
   const router = useRouter();
@@ -25,15 +26,24 @@ export default function PaymentsPage() {
   const { data: payments, isLoading } = useQuery<Payment[]>({
     queryKey: ['payments', userId, selectedUniversityId],
     queryFn: async () => {
-      if (!userId) return [];
-      if (selectedUniversityId) {
-        const response = await apiClient.get(`/api/payment/user/${userId}/university/${selectedUniversityId}`);
-        return response.data;
+      if (!userId) return samplePayments;
+      try {
+        if (selectedUniversityId) {
+          const response = await apiClient.get(`/api/payment/user/${userId}/university/${selectedUniversityId}`);
+          return response.data || [];
+        }
+        const response = await apiClient.get(`/api/payment/user/${userId}`);
+        return response.data || [];
+      } catch (error) {
+        console.warn('Failed to fetch payments, using sample data:', error);
+        // 選択された大学でフィルタリング
+        if (selectedUniversityId) {
+          return samplePayments.filter(p => p.universityId === selectedUniversityId);
+        }
+        return samplePayments;
       }
-      const response = await apiClient.get(`/api/payment/user/${userId}`);
-      return response.data;
     },
-    enabled: !!userId,
+    enabled: true, // 常に有効にしてサンプルデータを表示
   });
 
   const getStatusColor = (status: string) => {
