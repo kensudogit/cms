@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import apiClient from '@/lib/api';
 import { ProcedureFlowDetail, University } from '@/lib/types';
 import { sampleUniversities, createSampleProcedureFlowDetail } from '@/lib/sampleData';
+import { StepActions } from '@/components/StepActions';
 
 export default function ProcedureFlowDetailPage() {
   const router = useRouter();
@@ -254,30 +255,19 @@ export default function ProcedureFlowDetailPage() {
                       </div>
 
                       {userId && (
-                        <div className="flex items-center space-x-2 ml-11">
-                          {step.progressStatus === 'NOT_STARTED' && step.canStart && (
-                            <button
-                              onClick={() => handleStartStep(step.id)}
-                              disabled={startStepMutation.isPending}
-                              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-all disabled:opacity-50"
-                            >
-                              開始
-                            </button>
-                          )}
-                          {step.progressStatus === 'IN_PROGRESS' && (
-                            <button
-                              onClick={() => handleCompleteStep(step.id)}
-                              disabled={completeStepMutation.isPending}
-                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition-all disabled:opacity-50"
-                            >
-                              完了
-                            </button>
-                          )}
+                        <div className="ml-11 mt-4">
+                          <StepActions
+                            step={step}
+                            onStart={() => handleStartStep(step.id)}
+                            onComplete={() => handleCompleteStep(step.id)}
+                            isStarting={startStepMutation.isPending}
+                            isCompleting={completeStepMutation.isPending}
+                          />
                           {step.progressStatus === 'BLOCKED' && (
-                            <p className="text-sm text-red-600">依存ステップが未完了です</p>
+                            <p className="text-sm text-red-600 mt-2">依存ステップが未完了です</p>
                           )}
                           {step.progressCompletedAt && (
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-slate-500 mt-2">
                               完了日時: {new Date(step.progressCompletedAt).toLocaleString('ja-JP')}
                             </p>
                           )}

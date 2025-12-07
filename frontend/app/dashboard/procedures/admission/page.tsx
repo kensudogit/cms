@@ -8,6 +8,7 @@ import { useAuthStore } from '@/store/authStore';
 import apiClient from '@/lib/api';
 import { ProcedureFlowDetail, University } from '@/lib/types';
 import { sampleUniversities, sampleProcedureFlows } from '@/lib/sampleData';
+import { StepActions } from '@/components/StepActions';
 
 export default function AdmissionProcedurePage() {
   const router = useRouter();
@@ -377,39 +378,28 @@ export default function AdmissionProcedurePage() {
                         </div>
 
                         {userId && (userRole === 'STUDENT' || userRole === 'PARENT') && (
-                          <div className="flex items-center space-x-2 ml-13">
-                            {step.progressStatus === 'NOT_STARTED' && step.canStart && (
-                              <button
-                                onClick={() => handleStartStep(step.id)}
-                                disabled={startStepMutation.isPending}
-                                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-all disabled:opacity-50 shadow-md hover:shadow-lg"
-                              >
-                                開始
-                              </button>
-                            )}
-                            {step.progressStatus === 'IN_PROGRESS' && (
-                              <button
-                                onClick={() => {
-                                  // 入学金・授業料関連のステップの場合は支払い記録も作成
-                                  if (step.name.includes('入学金') || step.name.includes('授業料') || step.name.includes('納付')) {
-                                    handleCompleteStepWithPayment(step.id, flow.id, step.name);
-                                  } else {
-                                    handleCompleteStep(step.id);
-                                  }
-                                }}
-                                disabled={completeStepMutation.isPending || createPaymentMutation.isPending}
-                                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition-all disabled:opacity-50 shadow-md hover:shadow-lg"
-                              >
-                                {completeStepMutation.isPending || createPaymentMutation.isPending ? '処理中...' : '完了'}
-                              </button>
-                            )}
+                          <div className="ml-13 mt-4">
+                            <StepActions
+                              step={step}
+                              onStart={() => handleStartStep(step.id)}
+                              onComplete={() => {
+                                // 入学金・授業料関連のステップの場合は支払い記録も作成
+                                if (step.name.includes('入学金') || step.name.includes('授業料') || step.name.includes('納付')) {
+                                  handleCompleteStepWithPayment(step.id, flow.id, step.name);
+                                } else {
+                                  handleCompleteStep(step.id);
+                                }
+                              }}
+                              isStarting={startStepMutation.isPending}
+                              isCompleting={completeStepMutation.isPending || createPaymentMutation.isPending}
+                            />
                             {step.progressStatus === 'BLOCKED' && (
-                              <p className="text-sm text-red-600 font-semibold">
+                              <p className="text-sm text-red-600 font-semibold mt-2">
                                 ⚠️ 依存ステップが未完了です
                               </p>
                             )}
                             {step.progressCompletedAt && (
-                              <p className="text-xs text-slate-500 ml-4">
+                              <p className="text-xs text-slate-500 mt-2">
                                 完了日時: {new Date(step.progressCompletedAt).toLocaleString('ja-JP')}
                               </p>
                             )}
