@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '@/store/authStore';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -10,10 +10,12 @@ import { ContentRequest, University, ContentCategory } from '@/lib/types';
 
 export default function NewContentPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const userId = useAuthStore((state) => state.userId);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const universityIdFromQuery = searchParams.get('universityId');
 
   const { data: universities } = useQuery<University[]>({
     queryKey: ['universities'],
@@ -27,15 +29,23 @@ export default function NewContentPage() {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<ContentRequest & { status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED' }>({
     defaultValues: {
       status: 'DRAFT',
-      universityId: universities?.[0]?.id || 1,
+      universityId: universityIdFromQuery ? Number(universityIdFromQuery) : (universities?.[0]?.id || 1),
     },
   });
 
   const universityId = watch('universityId');
+
+  // クエリパラメータから大学IDを設定
+  useEffect(() => {
+    if (universityIdFromQuery && !universityId) {
+      setValue('universityId', Number(universityIdFromQuery));
+    }
+  }, [universityIdFromQuery, universityId, setValue]);
 
   const { data: categories } = useQuery<ContentCategory[]>({
     queryKey: ['categories', universityId],

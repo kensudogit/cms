@@ -216,21 +216,32 @@ export default function EditUniversityPage() {
                 </label>
               </div>
 
-              <div className="flex justify-end space-x-4 pt-8 border-t border-slate-200/50">
-                <button
-                  type="button"
-                  onClick={() => router.push('/dashboard/universities')}
-                  className="px-6 py-3 border-2 border-slate-300 rounded-xl shadow-md text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 transition-all"
+              <div className="flex justify-between items-center pt-8 border-t border-slate-200/50">
+                <Link
+                  href={`/dashboard/universities/${id}/contents`}
+                  className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-bold shadow-lg hover:shadow-xl transition-all flex items-center space-x-2"
                 >
-                  キャンセル
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-8 py-3.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white rounded-xl text-sm font-bold shadow-xl hover:shadow-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? '更新中...' : '更新する'}
-                </button>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>コンテンツ管理</span>
+                </Link>
+                <div className="flex space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => router.push('/dashboard/universities')}
+                    className="px-6 py-3 border-2 border-slate-300 rounded-xl shadow-md text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 transition-all"
+                  >
+                    キャンセル
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-8 py-3.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white rounded-xl text-sm font-bold shadow-xl hover:shadow-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? '更新中...' : '更新する'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
