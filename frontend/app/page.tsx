@@ -95,12 +95,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
             <div className="flex items-center space-x-4">
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full shadow-xl overflow-hidden">
+              <div className="relative w-12 h-12 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full shadow-xl overflow-hidden">
                 <Image
                   src="/PC.png"
                   alt="CMS Logo"
-                  width={112}
-                  height={112}
+                  width={48}
+                  height={48}
                   className="object-contain w-full h-full logo-shake"
                   priority
                   unoptimized
