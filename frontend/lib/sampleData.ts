@@ -1,4 +1,4 @@
-import { University, ProcedureFlow, Payment, Content } from './types';
+import { University, ProcedureFlow, Payment, Content, ProcedureFlowDetail, ProcedureStepWithProgress } from './types';
 
 // サンプル大学データ（20校）
 export const sampleUniversities: University[] = [
@@ -205,57 +205,105 @@ export const sampleUniversities: University[] = [
 ];
 
 // サンプル手続きフローデータ
-export const sampleProcedureFlows: ProcedureFlow[] = [
-  {
-    id: 1,
-    universityId: 1,
-    name: '入学手続きフロー',
-    description: '新入生向けの入学手続きフローです。',
-    flowType: '入学',
-    displayOrder: 1,
-    active: true,
-    steps: [
-      {
-        id: 1,
-        flowId: 1,
-        contentId: 1,
-        name: '入学願書の提出',
-        description: '入学願書を提出してください',
-        stepOrder: 1,
-        isRequired: true,
-        active: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        id: 2,
-        flowId: 1,
-        contentId: 2,
-        name: '入学検定料の納付',
-        description: '入学検定料を納付してください',
-        stepOrder: 2,
-        isRequired: true,
-        active: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    universityId: 1,
-    name: '卒業手続きフロー',
-    description: '卒業予定者向けの手続きフローです。',
-    flowType: '卒業',
-    displayOrder: 2,
-    active: true,
-    steps: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+// 各大学に対して入学手続きフローと卒業手続きフローを作成
+export const sampleProcedureFlows: ProcedureFlow[] = (() => {
+  const flows: ProcedureFlow[] = [];
+  
+  // 各大学（1-20）に対して入学手続きフローと卒業手続きフローを作成
+  for (let univId = 1; univId <= 20; univId++) {
+    // 入学手続きフロー
+    flows.push({
+      id: univId * 2 - 1,
+      universityId: univId,
+      name: '入学手続きフロー',
+      description: '新入生向けの入学手続きフローです。',
+      flowType: '入学',
+      displayOrder: 1,
+      active: true,
+      steps: [
+        {
+          id: (univId * 2 - 1) * 10 + 1,
+          flowId: univId * 2 - 1,
+          contentId: 1,
+          name: '入学願書の提出',
+          description: '入学願書を提出してください',
+          stepOrder: 1,
+          isRequired: true,
+          active: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: (univId * 2 - 1) * 10 + 2,
+          flowId: univId * 2 - 1,
+          contentId: 2,
+          name: '入学検定料の納付',
+          description: '入学検定料を納付してください',
+          stepOrder: 2,
+          isRequired: true,
+          active: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: (univId * 2 - 1) * 10 + 3,
+          flowId: univId * 2 - 1,
+          contentId: 3,
+          name: '入学金の納付',
+          description: '入学金を納付してください',
+          stepOrder: 3,
+          isRequired: true,
+          active: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    // 卒業手続きフロー
+    flows.push({
+      id: univId * 2,
+      universityId: univId,
+      name: '卒業手続きフロー',
+      description: '卒業予定者向けの手続きフローです。',
+      flowType: '卒業',
+      displayOrder: 2,
+      active: true,
+      steps: [
+        {
+          id: (univId * 2) * 10 + 1,
+          flowId: univId * 2,
+          contentId: 1,
+          name: '卒業論文の提出',
+          description: '卒業論文を提出してください',
+          stepOrder: 1,
+          isRequired: true,
+          active: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: (univId * 2) * 10 + 2,
+          flowId: univId * 2,
+          contentId: 2,
+          name: '卒業手続き書類の提出',
+          description: '卒業手続きに必要な書類を提出してください',
+          stepOrder: 2,
+          isRequired: true,
+          active: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+  }
+  
+  return flows;
+})();
 
 // サンプル支払いデータ
 export const samplePayments: Payment[] = [
@@ -349,4 +397,40 @@ export const sampleContents: Content[] = [
     publishedAt: new Date().toISOString(),
   },
 ];
+
+// サンプル手続きフロー詳細データを作成する関数
+export const createSampleProcedureFlowDetail = (flowId: number, universityId: number): ProcedureFlowDetail | null => {
+  const flow = sampleProcedureFlows.find(f => f.id === flowId && f.universityId === universityId);
+  if (!flow) return null;
+
+  const stepsWithProgress: ProcedureStepWithProgress[] = (flow.steps || []).map((step, index) => ({
+    ...step,
+    progressStatus: 'NOT_STARTED' as const,
+    canStart: index === 0, // 最初のステップのみ開始可能
+  }));
+
+  const totalSteps = stepsWithProgress.length;
+  const completedSteps = stepsWithProgress.filter(s => s.progressStatus === 'COMPLETED').length;
+  const inProgressSteps = stepsWithProgress.filter(s => s.progressStatus === 'IN_PROGRESS').length;
+  const notStartedSteps = stepsWithProgress.filter(s => s.progressStatus === 'NOT_STARTED').length;
+  const completionRate = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
+
+  return {
+    id: flow.id,
+    universityId: flow.universityId,
+    name: flow.name,
+    description: flow.description,
+    flowType: flow.flowType,
+    displayOrder: flow.displayOrder,
+    active: flow.active,
+    steps: stepsWithProgress,
+    totalSteps,
+    completedSteps,
+    inProgressSteps,
+    notStartedSteps,
+    completionRate,
+    createdAt: flow.createdAt,
+    updatedAt: flow.updatedAt,
+  };
+};
 

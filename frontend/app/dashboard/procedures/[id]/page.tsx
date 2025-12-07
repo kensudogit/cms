@@ -5,7 +5,8 @@ import { useRouter, useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/authStore';
 import apiClient from '@/lib/api';
-import { ProcedureFlowDetail } from '@/lib/types';
+import { ProcedureFlowDetail, University } from '@/lib/types';
+import { sampleUniversities, createSampleProcedureFlowDetail } from '@/lib/sampleData';
 
 export default function ProcedureFlowDetailPage() {
   const router = useRouter();
@@ -15,24 +16,57 @@ export default function ProcedureFlowDetailPage() {
   const userId = useAuthStore((state) => state.userId);
   const [selectedUniversityId, setSelectedUniversityId] = useState<number | null>(null);
 
-  const { data: universities } = useQuery({
+  const { data: universities } = useQuery<University[]>({
     queryKey: ['universities'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/university/active');
-      return response.data;
+      try {
+        const response = await apiClient.get('/api/university/active');
+        return response.data || [];
+      } catch (error) {
+        console.warn('Failed to fetch universities, using sample data:', error);
+        return sampleUniversities;
+      }
     },
   });
 
   const { data: flowDetail, isLoading } = useQuery<ProcedureFlowDetail>({
     queryKey: ['procedure-flow-detail', id, selectedUniversityId, userId],
     queryFn: async () => {
-      if (!selectedUniversityId) throw new Error('University not selected');
-      const response = await apiClient.get(
-        `/api/procedure-flow/${id}/university/${selectedUniversityId}${userId ? `?userId=${userId}` : ''}`
-      );
-      return response.data;
+      const flowId = Number(id);
+      
+      // 大学が選択されていない場合、フローIDから大学IDを推測してサンプルデータを返す
+      if (!selectedUniversityId) {
+        // フローIDが奇数の場合は入学フロー、偶数の場合は卒業フロー
+        // フローIDから大学IDを計算: (flowId + 1) / 2 または flowId / 2
+        const estimatedUnivId = flowId % 2 === 1 ? Math.floor((flowId + 1) / 2) : flowId / 2;
+        const sampleDetail = createSampleProcedureFlowDetail(flowId, estimatedUnivId);
+        if (sampleDetail) return sampleDetail;
+        // 推測できない場合は大学ID 1を使用
+        const fallbackDetail = createSampleProcedureFlowDetail(flowId, 1);
+        if (fallbackDetail) return fallbackDetail;
+        throw new Error('University not selected');
+      }
+      
+      try {
+        const response = await apiClient.get(
+          `/api/procedure-flow/${id}/university/${selectedUniversityId}${userId ? `?userId=${userId}` : ''}`
+        );
+        const apiData = response.data;
+        // APIからデータが取得できない場合、サンプルデータを返す
+        if (!apiData) {
+          const sampleDetail = createSampleProcedureFlowDetail(flowId, selectedUniversityId);
+          if (sampleDetail) return sampleDetail;
+        }
+        return apiData;
+      } catch (error) {
+        console.warn('Failed to fetch flow detail, using sample data:', error);
+        // エラー時はサンプルデータを返す
+        const sampleDetail = createSampleProcedureFlowDetail(flowId, selectedUniversityId);
+        if (sampleDetail) return sampleDetail;
+        throw error;
+      }
     },
-    enabled: !!selectedUniversityId && !!id,
+    enabled: true, // 常に有効にしてサンプルデータを表示
   });
 
   const startStepMutation = useMutation({
@@ -138,9 +172,9 @@ export default function ProcedureFlowDetailPage() {
               className="block w-full max-w-md border-2 border-slate-200 rounded-xl shadow-sm py-3 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium cursor-pointer"
             >
               <option value="">大学を選択してください</option>
-              {universities?.map((univ: any) => (
+              {(universities && universities.length > 0 ? universities : sampleUniversities).map((univ: University) => (
                 <option key={univ.id} value={univ.id}>
-                  {univ.name}
+                  {univ.name} {!universities || universities.length === 0 ? '(サンプル)' : ''}
                 </option>
               ))}
             </select>
