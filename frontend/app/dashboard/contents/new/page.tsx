@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '@/store/authStore';
@@ -8,7 +8,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { ContentRequest, University, ContentCategory } from '@/lib/types';
 
-export default function NewContentPage() {
+function NewContentForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
@@ -299,6 +299,21 @@ export default function NewContentPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function NewContentPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600"></div>
+          <p className="mt-6 text-slate-600 font-medium">読み込み中...</p>
+        </div>
+      </div>
+    }>
+      <NewContentForm />
+    </Suspense>
   );
 }
 
