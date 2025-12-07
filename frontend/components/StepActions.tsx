@@ -156,16 +156,17 @@ export function StepActions({ step, onStart, onComplete, isStarting, isCompletin
     if (isFileUploadStep) {
       return (
         <div className="space-y-4 w-full">
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">
-              ファイルを選択（Excel または PDF）
-            </label>
-            <input
-              type="file"
-              accept=".xlsx,.xls,.pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/pdf"
-              onChange={handleFileChange}
-              className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-            />
+                <div>
+                  <label htmlFor="file-upload" className="block text-sm font-bold text-slate-700 mb-2">
+                    ファイルを選択（Excel または PDF）
+                  </label>
+                  <input
+                    id="file-upload"
+                    type="file"
+                    accept=".xlsx,.xls,.pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/pdf"
+                    onChange={handleFileChange}
+                    className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                  />
             {uploadedFile && (
               <p className="text-sm text-slate-600 mt-2">
                 選択されたファイル: {uploadedFile.name}
