@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { University, ProcedureFlow, Content } from '@/lib/types';
+import { sampleUniversities, sampleProcedureFlows, sampleContents } from '@/lib/sampleData';
 
 function ImplementationCheckContent() {
   const router = useRouter();
@@ -23,27 +24,38 @@ function ImplementationCheckContent() {
   const { data: universities, isLoading: universitiesLoading } = useQuery<University[]>({
     queryKey: ['universities'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/university/active');
-      return response.data;
+      try {
+        const response = await apiClient.get('/api/university/active');
+        return response.data || [];
+      } catch (error) {
+        console.warn('Failed to fetch universities, using sample data:', error);
+        return sampleUniversities;
+      }
     },
   });
 
   const { data: allFlows, isLoading: flowsLoading } = useQuery<ProcedureFlow[]>({
     queryKey: ['all-procedure-flows'],
     queryFn: async () => {
-      if (!universities || universities.length === 0) return [];
+      if (!universities || universities.length === 0) return sampleProcedureFlows;
       const flows: ProcedureFlow[] = [];
+      let hasError = false;
       for (const univ of universities) {
         try {
           const response = await apiClient.get(`/api/procedure-flow/university/${univ.id}`);
-          flows.push(...response.data);
+          flows.push(...(response.data || []));
         } catch (error) {
           console.error(`Failed to fetch flows for university ${univ.id}:`, error);
+          hasError = true;
         }
       }
-      return flows;
+      // APIエラーが発生した場合、サンプルデータを返す
+      if (hasError && flows.length === 0) {
+        return sampleProcedureFlows;
+      }
+      return flows.length > 0 ? flows : sampleProcedureFlows;
     },
-    enabled: !!universities && universities.length > 0,
+    enabled: true, // 常に有効にしてサンプルデータを表示
   });
 
   const { data: allContents, isLoading: contentsLoading } = useQuery<Content[]>({
@@ -51,10 +63,10 @@ function ImplementationCheckContent() {
     queryFn: async () => {
       try {
         const response = await apiClient.get('/api/content');
-        return response.data;
+        return response.data || [];
       } catch (error) {
-        console.error('Failed to fetch contents:', error);
-        return [];
+        console.warn('Failed to fetch contents, using sample data:', error);
+        return sampleContents;
       }
     },
   });

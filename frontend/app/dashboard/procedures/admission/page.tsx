@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/authStore';
 import apiClient from '@/lib/api';
 import { ProcedureFlowDetail, University } from '@/lib/types';
+import { sampleUniversities, sampleProcedureFlows } from '@/lib/sampleData';
 
 export default function AdmissionProcedurePage() {
   const router = useRouter();
@@ -18,8 +19,13 @@ export default function AdmissionProcedurePage() {
   const { data: universities } = useQuery<University[]>({
     queryKey: ['universities'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/university/active');
-      return response.data;
+      try {
+        const response = await apiClient.get('/api/university/active');
+        return response.data || [];
+      } catch (error) {
+        console.warn('Failed to fetch universities, using sample data:', error);
+        return sampleUniversities;
+      }
     },
   });
 
@@ -27,10 +33,39 @@ export default function AdmissionProcedurePage() {
   const { data: admissionFlows, isLoading: flowsLoading } = useQuery<ProcedureFlowDetail[]>({
     queryKey: ['admission-flows', selectedUniversityId, userId],
     queryFn: async () => {
-      if (!selectedUniversityId) return [];
+      if (!selectedUniversityId) {
+        // 大学が選択されていない場合、サンプルデータから入学フローを返す
+        const sampleAdmissionFlow = sampleProcedureFlows.find(f => f.flowType === '入学');
+        if (sampleAdmissionFlow) {
+          return [{
+            ...sampleAdmissionFlow,
+            totalSteps: sampleAdmissionFlow.steps?.length || 0,
+            completedSteps: 0,
+            inProgressSteps: 0,
+            notStartedSteps: sampleAdmissionFlow.steps?.length || 0,
+            completionRate: 0,
+          } as ProcedureFlowDetail];
+        }
+        return [];
+      }
       try {
         const response = await apiClient.get(`/api/procedure-flow/university/${selectedUniversityId}/type/入学`);
-        const flows = response.data;
+        const flows = response.data || [];
+        
+        if (flows.length === 0) {
+          // APIからデータが取得できない場合、サンプルデータを返す
+          const sampleAdmissionFlow = sampleProcedureFlows.find(f => f.flowType === '入学' && f.universityId === selectedUniversityId);
+          if (sampleAdmissionFlow) {
+            return [{
+              ...sampleAdmissionFlow,
+              totalSteps: sampleAdmissionFlow.steps?.length || 0,
+              completedSteps: 0,
+              inProgressSteps: 0,
+              notStartedSteps: sampleAdmissionFlow.steps?.length || 0,
+              completionRate: 0,
+            } as ProcedureFlowDetail];
+          }
+        }
         
         // 各フローの詳細を取得
         const flowDetails = await Promise.all(
@@ -47,11 +82,23 @@ export default function AdmissionProcedurePage() {
         );
         return flowDetails;
       } catch (error) {
-        console.error('Failed to fetch admission flows:', error);
+        console.warn('Failed to fetch admission flows, using sample data:', error);
+        // エラー時はサンプルデータを返す
+        const sampleAdmissionFlow = sampleProcedureFlows.find(f => f.flowType === '入学' && f.universityId === selectedUniversityId);
+        if (sampleAdmissionFlow) {
+          return [{
+            ...sampleAdmissionFlow,
+            totalSteps: sampleAdmissionFlow.steps?.length || 0,
+            completedSteps: 0,
+            inProgressSteps: 0,
+            notStartedSteps: sampleAdmissionFlow.steps?.length || 0,
+            completionRate: 0,
+          } as ProcedureFlowDetail];
+        }
         return [];
       }
     },
-    enabled: !!selectedUniversityId,
+    enabled: true, // 常に有効にしてサンプルデータを表示
   });
 
   const startStepMutation = useMutation({
