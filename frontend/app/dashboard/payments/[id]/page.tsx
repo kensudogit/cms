@@ -228,7 +228,7 @@ export default function PaymentDetailPage() {
               </div>
             </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div className="bg-white/60 rounded-xl p-4 backdrop-blur-sm">
                   <p className="text-xs text-slate-500 mb-2 font-semibold">支払い金額</p>
                   <p className="text-3xl font-bold text-indigo-600">{formatCurrency(payment.amount, payment.currency)}</p>
@@ -251,9 +251,9 @@ export default function PaymentDetailPage() {
                     </p>
                   </div>
                 )}
-              </div>
+            </div>
 
-              {payment.reconciliation && (
+            {payment.reconciliation && (
                 <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-200/50 mb-6">
                   <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center">
                     <svg className="w-6 h-6 text-emerald-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,16 +284,16 @@ export default function PaymentDetailPage() {
                     )}
                   </div>
                 </div>
-              )}
+            )}
 
-              {payment.notes && (
+            {payment.notes && (
                 <div className="bg-slate-50 rounded-xl p-4 mb-6">
                   <p className="text-xs text-slate-500 mb-2 font-semibold">備考</p>
                   <p className="text-sm text-slate-700">{payment.notes}</p>
                 </div>
-              )}
+            )}
 
-              {payment.reconciliation && (
+            {payment.reconciliation && (
                 <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-200/50 mb-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold text-slate-800 flex items-center">
@@ -342,9 +342,9 @@ export default function PaymentDetailPage() {
                     )}
                   </div>
                 </div>
-              )}
+            )}
 
-              <div className="flex items-center space-x-4 pt-6 border-t border-slate-200/50">
+            <div className="flex items-center space-x-4 pt-6 border-t border-slate-200/50">
                 <button
                   onClick={handleDelete}
                   disabled={deletePaymentMutation.isPending}
