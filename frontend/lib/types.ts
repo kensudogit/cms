@@ -105,39 +105,6 @@ export interface ContentCategoryRequest {
   active?: boolean;
 }
 
-export interface ContentTemplate {
-  id: number;
-  universityId: number;
-  name: string;
-  content?: string;
-  categoryId?: number;
-  type: string;
-  active: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ContentTemplateRequest {
-  universityId: number;
-  name: string;
-  content?: string;
-  categoryId?: number;
-  type: string;
-  active?: boolean;
-}
-
-export interface ContentVersion {
-  id: number;
-  contentId: number;
-  versionNumber: number;
-  title: string;
-  body: string;
-  slug: string;
-  authorId: number;
-  changeNote?: string;
-  createdAt: string;
-}
-
 export interface ProcedureFlow {
   id: number;
   universityId: number;
@@ -149,15 +116,6 @@ export interface ProcedureFlow {
   steps?: ProcedureStep[];
   createdAt: string;
   updatedAt: string;
-}
-
-export interface ProcedureFlowRequest {
-  universityId: number;
-  name: string;
-  description?: string;
-  flowType: string;
-  displayOrder?: number;
-  active?: boolean;
 }
 
 export interface ProcedureStep {
@@ -173,42 +131,6 @@ export interface ProcedureStep {
   active: boolean;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface ProcedureStepRequest {
-  flowId: number;
-  contentId: number;
-  name: string;
-  description?: string;
-  stepOrder: number;
-  requiredRole?: string;
-  isRequired?: boolean;
-  dependsOnStepIds?: string;
-  active?: boolean;
-}
-
-export interface ProcedureProgress {
-  id: number;
-  userId: number;
-  stepId: number;
-  flowId: number;
-  universityId: number;
-  status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'SKIPPED' | 'BLOCKED';
-  startedAt?: string;
-  completedAt?: string;
-  notes?: string;
-  step?: ProcedureStep;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ProcedureProgressRequest {
-  userId: number;
-  stepId: number;
-  flowId: number;
-  universityId: number;
-  status?: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'SKIPPED' | 'BLOCKED';
-  notes?: string;
 }
 
 export interface ProcedureFlowDetail {
@@ -253,7 +175,8 @@ export interface Payment {
   id: number;
   userId: number;
   universityId: number;
-  flowId: number;
+  flowId?: number;
+  contentId?: number; // セミナー・シンポジウムのID
   paymentType: string;
   amount: number;
   currency: string;
@@ -270,7 +193,8 @@ export interface Payment {
 export interface PaymentRequest {
   userId: number;
   universityId: number;
-  flowId: number;
+  flowId?: number;
+  contentId?: number;
   paymentType: string;
   amount: number;
   currency?: string;
@@ -306,5 +230,39 @@ export interface PaymentReconciliationRequest {
   notes?: string;
 }
 
+// セミナー・シンポジウムの申し込み
+export interface SeminarRegistration {
+  id: number;
+  userId: number;
+  contentId: number; // セミナー・シンポジウムのコンテンツID
+  universityId: number;
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  registrationDate: string;
+  attendanceStatus?: 'ATTENDED' | 'ABSENT' | 'PENDING';
+  notes?: string;
+  payment?: Payment;
+  createdAt: string;
+  updatedAt: string;
+}
 
+export interface SeminarRegistrationRequest {
+  userId: number;
+  contentId: number;
+  universityId: number;
+  status?: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  notes?: string;
+}
 
+export interface ProcedureProgress {
+  id: number;
+  userId: number;
+  stepId: number;
+  flowId: number;
+  universityId: number;
+  status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'SKIPPED' | 'BLOCKED';
+  startedAt?: string;
+  completedAt?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
