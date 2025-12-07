@@ -502,3 +502,4 @@ export const getMockProcedureProgressByUserId = (userId: number): ProcedureProgr
   return mockProcedureProgress.filter((progress) => progress.userId === userId);
 };
 
+

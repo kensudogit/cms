@@ -225,3 +225,4 @@ NEXT_PUBLIC_API_BASE_URL=https://your-api-gateway-url.railway.app
 - [Next.js Deployment](https://nextjs.org/docs/deployment)
 - [Spring Boot Deployment](https://spring.io/guides/gs/spring-boot-for-azure/)
 
+

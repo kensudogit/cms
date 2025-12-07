@@ -17,3 +17,4 @@ public interface ProcedureProgressRepository extends JpaRepository<ProcedureProg
     Long countByUserIdAndFlowIdAndStatus(Long userId, Long flowId, ProcedureProgress.ProgressStatus status);
 }
 
+

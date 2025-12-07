@@ -17,3 +17,4 @@ public interface PaymentReconciliationRepository extends JpaRepository<PaymentRe
     Optional<PaymentReconciliation> findByPaymentIdAndStatus(Long paymentId, PaymentReconciliation.ReconciliationStatus status);
 }
 
+

@@ -132,3 +132,4 @@ ALLOWED_ORIGINS=*
 - [ ] CORS設定が正しい
 - [ ] フロントエンドからAPI Gatewayに接続できる
 
+
