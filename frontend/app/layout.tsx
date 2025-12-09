@@ -1,34 +1,13 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { Providers } from './providers';
+import { routing } from '@/i18n/routing';
+import { redirect } from 'next/navigation';
 
-const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: 'CMS - Content Management System',
-  description: 'Webシステムリプレース CMS設計',
-  icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/PC.png', sizes: 'any' },
-    ],
-    shortcut: '/favicon.ico',
-    apple: '/PC.png',
-  },
-};
-
+// ルートレイアウトは[locale]フォルダにリダイレクト
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <html lang="ja">
-      <body className={inter.className}>
-        <Providers>{children}</Providers>
-      </body>
-    </html>
-  );
+  // デフォルト言語にリダイレクト
+  redirect(`/${routing.defaultLocale}`);
 }
 
