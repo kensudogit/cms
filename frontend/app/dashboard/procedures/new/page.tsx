@@ -75,6 +75,9 @@ export default function NewProcedureFlowPage() {
                 <p className="text-xs text-slate-500 font-medium">Create New Procedure Flow</p>
               </div>
             </div>
+            <div className="flex items-center space-x-4">
+              {/* LanguageSwitcher is now in the layout, but we can add it here too if needed */}
+            </div>
           </div>
         </div>
       </nav>

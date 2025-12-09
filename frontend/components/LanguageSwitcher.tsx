@@ -2,12 +2,18 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
 
 export default function LanguageSwitcher() {
-  const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  
+  // パスからロケールを取得、またはデフォルトを使用
+  const getLocale = () => {
+    const match = pathname?.match(/^\/(en|ja|vi|zh)/);
+    return match ? match[1] : 'ja';
+  };
+  
+  const locale = getLocale();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);

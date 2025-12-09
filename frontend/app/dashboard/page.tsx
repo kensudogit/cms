@@ -157,6 +157,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              {/* LanguageSwitcher is now in the layout */}
               {(userRole === 'ADMIN' || userRole === 'STAFF') && (
                 <Link
                   href="/dashboard/admin"
