@@ -39,10 +39,12 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // 接続エラーの場合は詳細をログに記録（開発環境のみ）
-    if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('API接続エラー:', {
+    // 接続エラーの場合は静かに処理（モックデータにフォールバックするため）
+    if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK' || error.code === 'ERR_CONNECTION_REFUSED') {
+      // 開発環境でもエラーメッセージを抑制（モックデータを使用するため）
+      // 必要に応じてデバッグモードで有効化
+      if (process.env.NEXT_PUBLIC_DEBUG_API === 'true') {
+        console.warn('API接続エラー（モックデータを使用）:', {
           message: error.message,
           baseURL: API_BASE_URL,
           code: error.code,

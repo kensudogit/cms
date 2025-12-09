@@ -29,8 +29,11 @@ export default function DashboardPage() {
       try {
         const response = await apiClient.get('/api/university/active');
         return response.data;
-      } catch (error) {
-        console.warn('Failed to fetch universities:', error);
+      } catch (error: any) {
+        // 接続エラーの場合は静かに処理
+        if (error.code !== 'ECONNREFUSED' && error.code !== 'ERR_NETWORK' && error.code !== 'ERR_CONNECTION_REFUSED') {
+          console.warn('Failed to fetch universities:', error);
+        }
         return [];
       }
     },
@@ -52,16 +55,11 @@ export default function DashboardPage() {
         
         return result;
       } catch (error: any) {
-        if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
-          if (process.env.NODE_ENV === 'development') {
-            console.warn('API接続エラー: バックエンドサーバーが起動していない可能性があります。');
-          }
-        } else {
+        // 接続エラーの場合は静かに処理（モックデータにフォールバック）
+        if (error.code !== 'ECONNREFUSED' && error.code !== 'ERR_NETWORK' && error.code !== 'ERR_CONNECTION_REFUSED') {
           console.warn('API request failed:', error);
         }
-        if (process.env.NODE_ENV === 'development') {
-          console.warn('Using sample data as fallback');
-        }
+        // モックデータを返す（エラーメッセージは表示しない）
         return [...sampleContents, ...allUniversityContents];
       }
     },
@@ -77,8 +75,11 @@ export default function DashboardPage() {
       try {
         const response = await apiClient.get('/api/procedure-flow');
         return response.data || [];
-      } catch (error) {
-        console.warn('Failed to fetch procedure flows:', error);
+      } catch (error: any) {
+        // 接続エラーの場合は静かに処理
+        if (error.code !== 'ECONNREFUSED' && error.code !== 'ERR_NETWORK' && error.code !== 'ERR_CONNECTION_REFUSED') {
+          console.warn('Failed to fetch procedure flows:', error);
+        }
         return [];
       }
     },
@@ -95,8 +96,11 @@ export default function DashboardPage() {
         if (!userId) return [];
         const response = await apiClient.get(`/api/procedure-progress/user/${userId}`);
         return response.data || [];
-      } catch (error) {
-        console.warn('Failed to fetch procedure progress:', error);
+      } catch (error: any) {
+        // 接続エラーの場合は静かに処理
+        if (error.code !== 'ECONNREFUSED' && error.code !== 'ERR_NETWORK' && error.code !== 'ERR_CONNECTION_REFUSED') {
+          console.warn('Failed to fetch procedure progress:', error);
+        }
         return [];
       }
     },

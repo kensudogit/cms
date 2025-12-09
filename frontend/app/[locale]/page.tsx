@@ -45,11 +45,8 @@ export default function Home() {
         const response = await apiClient.get('/api/content');
         return response.data;
       } catch (error: any) {
-        if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
-          if (process.env.NODE_ENV === 'development') {
-            console.warn('API接続エラー: バックエンドサーバーが起動していない可能性があります。モックデータを使用します。');
-          }
-        } else {
+        // 接続エラーの場合は静かに処理（モックデータにフォールバック）
+        if (error.code !== 'ECONNREFUSED' && error.code !== 'ERR_NETWORK' && error.code !== 'ERR_CONNECTION_REFUSED') {
           console.warn('API request failed, using mock data:', error);
         }
         return getMockContents();

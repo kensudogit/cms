@@ -52,7 +52,10 @@ export default function LoginPage() {
         router.push(`/${locale}/dashboard`);
         return;
       } catch (apiError: any) {
-        console.warn('API login failed, using mock authentication:', apiError);
+        // 接続エラーの場合は静かに処理（モック認証にフォールバック）
+        if (apiError.code !== 'ECONNREFUSED' && apiError.code !== 'ERR_NETWORK' && apiError.code !== 'ERR_CONNECTION_REFUSED') {
+          console.warn('API login failed, using mock authentication:', apiError);
+        }
         
         const user = mockUsers.find(u => u.email === email && u.password === password);
         
