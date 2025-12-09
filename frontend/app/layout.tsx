@@ -1,13 +1,10 @@
-import { routing } from '@/i18n/routing';
-import { redirect } from 'next/navigation';
-
-// ルートレイアウトは[locale]フォルダにリダイレクト
+// ルートレイアウト
+// [locale]フォルダのレイアウトが実際のレイアウトを提供
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // デフォルト言語にリダイレクト
-  redirect(`/${routing.defaultLocale}`);
+  return <>{children}</>;
 }
 

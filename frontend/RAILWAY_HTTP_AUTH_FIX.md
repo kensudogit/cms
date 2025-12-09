@@ -99,3 +99,4 @@ railway variables unset RAILWAY_HTTP_AUTH_ENABLED
 - 本番環境では、アプリケーション側の認証（ログイン機能）でセキュリティを確保してください
 - 開発環境でのみHTTP認証を使用する場合は、環境変数で制御できます
 
+
