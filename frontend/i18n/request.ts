@@ -1,12 +1,17 @@
 import { getRequestConfig } from 'next-intl/server';
-import { routing } from './routing';
 
-export default getRequestConfig({
-  // ルーティング設定を使用
-  ...routing,
-  // メッセージを読み込む
-  messages: async (locale) => {
-    return (await import(`../messages/${locale}.json`)).default;
-  },
+// サポートする言語
+const locales = ['en', 'ja', 'vi', 'zh'] as const;
+const defaultLocale = 'ja' as const;
+
+export default getRequestConfig(async ({ locale }) => {
+  // 有効なロケールかチェック、無効な場合はデフォルトを使用
+  const validLocale = locale && locales.includes(locale as any) 
+    ? locale 
+    : defaultLocale;
+
+  return {
+    messages: (await import(`../messages/${validLocale}.json`)).default,
+  };
 });
 
