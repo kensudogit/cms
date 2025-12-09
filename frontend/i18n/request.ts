@@ -4,13 +4,17 @@ import { getRequestConfig } from 'next-intl/server';
 const locales = ['en', 'ja', 'vi', 'zh'] as const;
 const defaultLocale = 'ja' as const;
 
-export default getRequestConfig(async ({ locale }) => {
+export default getRequestConfig(async ({ requestLocale }) => {
+  // リクエストからロケールを取得
+  let locale = await requestLocale;
+
   // 有効なロケールかチェック、無効な場合はデフォルトを使用
   const validLocale = locale && locales.includes(locale as any) 
     ? locale 
     : defaultLocale;
 
   return {
+    locale: validLocale,
     messages: (await import(`../messages/${validLocale}.json`)).default,
   };
 });
