@@ -1,7 +1,18 @@
-import createMiddleware from 'next-intl/middleware';
-import { routing } from './i18n/routing';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export default createMiddleware(routing);
+export function middleware(request: NextRequest) {
+  // ログインページへのアクセスは許可（リダイレクトしない）
+  
+  // すべてのパスへのアクセスを許可
+  const response = NextResponse.next();
+  
+  // セキュリティヘッダーを追加（オプション）
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  
+  return response;
+}
 
 export const config = {
   matcher: [

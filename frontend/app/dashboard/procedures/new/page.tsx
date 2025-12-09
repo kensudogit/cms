@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { ProcedureFlowRequest, University } from '@/lib/types';
+import { useLocalizedRouter } from '@/lib/hooks/useLocalizedRouter';
 
 export default function NewProcedureFlowPage() {
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
 
