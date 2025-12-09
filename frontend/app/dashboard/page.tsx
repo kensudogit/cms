@@ -10,6 +10,7 @@ import apiClient from '@/lib/api';
 import { Content, ProcedureFlow, ProcedureProgress } from '@/lib/types';
 import { allUniversityContents } from '@/lib/universityMockData';
 import { sampleContents } from '@/lib/sampleData';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -157,7 +158,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              {/* LanguageSwitcher is now in the layout */}
+              <LanguageSwitcher />
               {(userRole === 'ADMIN' || userRole === 'STAFF') && (
                 <Link
                   href="/dashboard/admin"

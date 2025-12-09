@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { ProcedureFlowRequest, University } from '@/lib/types';
 import { useLocalizedRouter } from '@/lib/hooks/useLocalizedRouter';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function NewProcedureFlowPage() {
   const router = useLocalizedRouter();
@@ -76,7 +77,7 @@ export default function NewProcedureFlowPage() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              {/* LanguageSwitcher is now in the layout, but we can add it here too if needed */}
+              <LanguageSwitcher />
             </div>
           </div>
         </div>
