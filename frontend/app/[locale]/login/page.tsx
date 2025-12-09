@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuthStore } from '@/store/authStore';
 import apiClient from '@/lib/api';
 import { LoginRequest } from '@/lib/types';
@@ -11,6 +11,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 export default function LoginPage() {
   const t = useTranslations();
   const router = useRouter();
+  const locale = useLocale();
   const setAuth = useAuthStore((state) => state.setAuth);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -48,7 +49,7 @@ export default function LoginPage() {
           role: authData.role,
         });
 
-        router.push('/dashboard');
+        router.push(`/${locale}/dashboard`);
         return;
       } catch (apiError: any) {
         console.warn('API login failed, using mock authentication:', apiError);
@@ -71,7 +72,7 @@ export default function LoginPage() {
           role: user.role,
         });
 
-        router.push('/dashboard');
+        router.push(`/${locale}/dashboard`);
       }
     } catch (err: any) {
       console.error('Login error:', err);

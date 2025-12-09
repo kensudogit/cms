@@ -29,7 +29,8 @@ export default function Home() {
     const hasStoredAuth = !!(storedToken || storedUser);
     
     if (!user && !token && !hasStoredAuth) {
-      router.push('/login');
+      const currentLocale = window.location.pathname.split('/')[1] || 'ja';
+      router.push(`/${currentLocale}/login`);
       return;
     }
     
