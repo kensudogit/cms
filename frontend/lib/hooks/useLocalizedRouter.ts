@@ -1,7 +1,6 @@
 'use client';
 
 import { useRouter as useNextRouter, usePathname } from 'next/navigation';
-import { useLocale } from 'next-intl';
 import { addLocaleToPath } from '@/lib/utils/path';
 
 /**
@@ -11,10 +10,14 @@ import { addLocaleToPath } from '@/lib/utils/path';
 export function useLocalizedRouter() {
   const router = useNextRouter();
   const pathname = usePathname();
-  const locale = useLocale();
 
-  // 現在のロケールを取得（パスから抽出、デフォルトは'ja'）
-  const currentLocale = pathname?.split('/')[1] || locale || 'ja';
+  // パスからロケールを取得、またはデフォルトを使用
+  const getLocale = () => {
+    const match = pathname?.match(/^\/(en|ja|vi|zh)/);
+    return match ? match[1] : 'ja';
+  };
+
+  const currentLocale = getLocale();
 
   return {
     push: (path: string) => {
