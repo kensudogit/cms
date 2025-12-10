@@ -46,17 +46,30 @@ export default function ContentDetailPage() {
     enabled: !!id,
   });
 
+  // アップロードURLをcustomFieldsから取得
+  const getUploadUrlFromContent = (content: Content | undefined): string => {
+    if (!content?.customFields) return '';
+    try {
+      const customFields = JSON.parse(content.customFields);
+      return customFields.uploadUrl || '';
+    } catch {
+      return '';
+    }
+  };
+
   const {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
-  } = useForm<ContentRequest & { status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED' }>({
+  } = useForm<ContentRequest & { status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'; uploadUrl?: string }>({
     defaultValues: {
       title: content?.title || '',
       body: content?.body || '',
       slug: content?.slug || '',
       status: content?.status || 'DRAFT',
+      uploadUrl: getUploadUrlFromContent(content),
     },
   });
 
@@ -67,6 +80,7 @@ export default function ContentDetailPage() {
         body: content.body,
         slug: content.slug,
         status: content.status,
+        uploadUrl: getUploadUrlFromContent(content),
       });
     }
   }, [content, reset]);
@@ -126,8 +140,32 @@ export default function ContentDetailPage() {
     },
   });
 
-  const onSubmit = (data: ContentRequest) => {
-    updateMutation.mutate(data);
+  const onSubmit = (data: ContentRequest & { uploadUrl?: string }) => {
+    // uploadUrlをcustomFieldsに含めて送信
+    const { uploadUrl, ...contentData } = data;
+    const customFields: any = {};
+    
+    // 既存のcustomFieldsを取得
+    if (content?.customFields) {
+      try {
+        Object.assign(customFields, JSON.parse(content.customFields));
+      } catch {
+        // パースエラーは無視
+      }
+    }
+    
+    // uploadUrlを追加
+    if (uploadUrl) {
+      customFields.uploadUrl = uploadUrl;
+    }
+    
+    // customFieldsをJSON文字列として設定
+    const requestData: ContentRequest = {
+      ...contentData,
+      customFields: Object.keys(customFields).length > 0 ? JSON.stringify(customFields) : undefined,
+    };
+    
+    updateMutation.mutate(requestData);
   };
 
   const handleDelete = () => {
@@ -303,6 +341,21 @@ export default function ContentDetailPage() {
                     <option value="PUBLISHED">公開</option>
                     <option value="ARCHIVED">アーカイブ</option>
                   </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="uploadUrl" className="block text-sm font-bold text-slate-700">
+                    アップロードURL
+                  </label>
+                  <input
+                    {...register('uploadUrl')}
+                    type="url"
+                    className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium placeholder:text-slate-400"
+                    placeholder="https://example.com/api/upload または /api/content/{id}/upload"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">
+                    ファイルアップロード先のURLを指定します。未指定の場合はデフォルトURLが使用されます。
+                  </p>
                 </div>
 
                 <div className="flex justify-end space-x-4 pt-8 border-t border-slate-200/50">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -15,6 +15,8 @@ export default function ContentsPage() {
   const queryClient = useQueryClient();
   const [selectedUniversityId, setSelectedUniversityId] = useState<number | null>(null);
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
+  const [uploadingContentId, setUploadingContentId] = useState<number | null>(null);
+  const fileInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
 
   // 大学一覧を取得
   const { data: universities } = useQuery<University[]>({
@@ -94,6 +96,70 @@ export default function ContentsPage() {
   const handleDelete = (content: Content) => {
     if (confirm(`コンテンツ「${content.title}」を削除してもよろしいですか？`)) {
       deleteMutation.mutate(content.id);
+    }
+  };
+
+  // アップロード先URLを取得（コンテンツのcustomFieldsから取得、またはデフォルトURL）
+  const getUploadUrl = (content: Content): string => {
+    try {
+      if (content.customFields) {
+        const customFields = JSON.parse(content.customFields);
+        if (customFields.uploadUrl) {
+          // URL内の{id}を実際のコンテンツIDに置換
+          return customFields.uploadUrl.replace('{id}', content.id.toString());
+        }
+      }
+    } catch (e) {
+      // JSON解析エラーは無視
+    }
+    
+    // デフォルトのアップロードURL
+    return `/api/content/${content.id}/upload`;
+  };
+
+  const handleFileSelect = (contentId: number) => {
+    const input = fileInputRefs.current[contentId];
+    if (input) {
+      input.click();
+    }
+  };
+
+  const handleFileChange = async (contentId: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadingContentId(contentId);
+    
+    try {
+      const content = contents?.find(c => c.id === contentId);
+      if (!content) return;
+
+      const uploadUrl = getUploadUrl(content);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('contentId', contentId.toString());
+
+      // アップロード実行
+      const response = await apiClient.post(uploadUrl, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      alert(`ファイル「${file.name}」のアップロードが完了しました。`);
+      
+      // コンテンツを更新（必要に応じて）
+      queryClient.invalidateQueries({ queryKey: ['contents'] });
+    } catch (error: any) {
+      console.error('File upload error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'アップロードに失敗しました';
+      alert(`ファイルのアップロードに失敗しました: ${errorMessage}`);
+    } finally {
+      setUploadingContentId(null);
+      // ファイル入力をリセット
+      if (fileInputRefs.current[contentId]) {
+        fileInputRefs.current[contentId]!.value = '';
+      }
     }
   };
 
@@ -228,12 +294,46 @@ export default function ContentsPage() {
                           <tr key={content.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
                             {displayFields.includes('title') && (
                               <td className="py-4 px-4">
-                                <Link
-                                  href={`/dashboard/contents/${content.id}`}
-                                  className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline"
-                                >
-                                  {content.title}
-                                </Link>
+                                <div className="flex items-center space-x-3">
+                                  <Link
+                                    href={`/dashboard/contents/${content.id}`}
+                                    className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline"
+                                  >
+                                    {content.title}
+                                  </Link>
+                                  <button
+                                    onClick={() => handleFileSelect(content.id)}
+                                    disabled={uploadingContentId === content.id}
+                                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 disabled:cursor-not-allowed text-white rounded-lg text-xs font-semibold transition-all flex items-center space-x-1"
+                                    title="ファイルをアップロード"
+                                  >
+                                    {uploadingContentId === content.id ? (
+                                      <>
+                                        <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span>アップロード中...</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                        </svg>
+                                        <span>アップロード</span>
+                                      </>
+                                    )}
+                                  </button>
+                                  <input
+                                    ref={(el) => {
+                                      fileInputRefs.current[content.id] = el;
+                                    }}
+                                    type="file"
+                                    className="hidden"
+                                    onChange={(e) => handleFileChange(content.id, e)}
+                                    accept="*/*"
+                                  />
+                                </div>
                               </td>
                             )}
                             {displayFields.includes('slug') && (
