@@ -202,6 +202,103 @@ function DynamicField({
     : {};
 
   const renderField = () => {
+    // fieldTypeがTEXTAREAの場合は、editMethodに関係なくテキストエリアを表示
+    if (config.fieldType === 'TEXTAREA') {
+      return (
+        <textarea
+          {...register(fieldName, {
+            required: config.required ? `${config.fieldName}は必須です` : false,
+            ...validation,
+          })}
+          rows={6}
+          className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium"
+          placeholder={config.description || config.fieldName}
+        />
+      );
+    }
+
+    // fieldTypeがSELECTまたはMULTI_SELECTの場合は、editMethodに関係なくセレクトボックスを表示
+    if (config.fieldType === 'SELECT' || config.fieldType === 'MULTI_SELECT') {
+      const options = config.editOptions ? JSON.parse(config.editOptions) : {};
+      const optionList = options.options || [];
+      const isMultiple = config.fieldType === 'MULTI_SELECT';
+      
+      return (
+        <select
+          {...register(fieldName, {
+            required: config.required ? `${config.fieldName}は必須です` : false,
+            ...validation,
+          })}
+          multiple={isMultiple}
+          className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium"
+        >
+          <option value="">選択してください</option>
+          {optionList.map((opt: string, idx: number) => (
+            <option key={idx} value={opt}>{opt}</option>
+          ))}
+        </select>
+      );
+    }
+
+    // fieldTypeがNUMBERの場合は、editMethodに関係なく数値入力フィールドを表示
+    if (config.fieldType === 'NUMBER') {
+      return (
+        <input
+          {...register(fieldName, {
+            required: config.required ? `${config.fieldName}は必須です` : false,
+            valueAsNumber: true,
+            ...validation,
+          })}
+          type="number"
+          className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium"
+          placeholder={config.description || config.fieldName}
+        />
+      );
+    }
+
+    // fieldTypeがDATEの場合は、editMethodに関係なく日付入力フィールドを表示
+    if (config.fieldType === 'DATE') {
+      return (
+        <input
+          {...register(fieldName, {
+            required: config.required ? `${config.fieldName}は必須です` : false,
+            ...validation,
+          })}
+          type="date"
+          className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium"
+        />
+      );
+    }
+
+    // fieldTypeがDATETIMEの場合は、editMethodに関係なく日時入力フィールドを表示
+    if (config.fieldType === 'DATETIME') {
+      return (
+        <input
+          {...register(fieldName, {
+            required: config.required ? `${config.fieldName}は必須です` : false,
+            ...validation,
+          })}
+          type="datetime-local"
+          className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium"
+        />
+      );
+    }
+
+    // fieldTypeがBOOLEANの場合は、editMethodに関係なくチェックボックスを表示
+    if (config.fieldType === 'BOOLEAN') {
+      return (
+        <div className="flex items-center space-x-2">
+          <input
+            {...register(fieldName)}
+            type="checkbox"
+            className="w-5 h-5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
+          />
+          <label className="text-sm font-medium text-slate-700">{config.fieldName}</label>
+        </div>
+      );
+    }
+
+    // editMethodに基づいてフィールドをレンダリング
     switch (config.editMethod) {
       case 'WYSIWYG':
         return (
@@ -229,21 +326,7 @@ function DynamicField({
           />
         );
       
-      case 'TEXTAREA':
-        return (
-          <textarea
-            {...register(fieldName, {
-              required: config.required ? `${config.fieldName}は必須です` : false,
-              ...validation,
-            })}
-            rows={6}
-            className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium"
-            placeholder={config.description || config.fieldName}
-          />
-        );
-      
       case 'SELECT_DROPDOWN':
-      case 'SELECT':
         const options = config.editOptions ? JSON.parse(config.editOptions) : {};
         const optionList = options.options || [];
         return (
@@ -297,29 +380,25 @@ function DynamicField({
           />
         );
       
-      case 'NUMBER':
-        return (
-          <input
-            {...register(fieldName, {
-              required: config.required ? `${config.fieldName}は必須です` : false,
-              valueAsNumber: true,
-              ...validation,
-            })}
-            type="number"
-            className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium"
-            placeholder={config.description || config.fieldName}
-          />
-        );
-      
       case 'INPUT':
       default:
+        // fieldTypeに基づいて適切なinputタイプを決定
+        // 注意: NUMBER, DATE, DATETIME, TEXTAREA, SELECT, MULTI_SELECT, BOOLEANは既に上記で処理済み
+        let inputType: string = 'text';
+        if (config.fieldType === 'EMAIL') {
+          inputType = 'email';
+        } else if (config.fieldType === 'URL') {
+          inputType = 'url';
+        }
+        // NUMBER, DATE, DATETIMEは既に上記のif文で処理されているため、ここでは処理しない
+        
         return (
           <input
             {...register(fieldName, {
               required: config.required ? `${config.fieldName}は必須です` : false,
               ...validation,
             })}
-            type={config.fieldType === 'EMAIL' ? 'email' : config.fieldType === 'URL' ? 'url' : 'text'}
+            type={inputType}
             className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium"
             placeholder={config.description || config.fieldName}
             defaultValue={config.defaultValue || ''}
