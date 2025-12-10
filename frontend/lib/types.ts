@@ -275,3 +275,107 @@ export interface ProcedureProgress {
   createdAt: string;
   updatedAt: string;
 }
+
+// 大学フィールド設定
+export type FieldType = 
+  | 'TEXT' 
+  | 'TEXTAREA' 
+  | 'RICH_TEXT' 
+  | 'NUMBER' 
+  | 'DATE' 
+  | 'DATETIME' 
+  | 'BOOLEAN' 
+  | 'SELECT' 
+  | 'MULTI_SELECT' 
+  | 'FILE' 
+  | 'IMAGE' 
+  | 'URL' 
+  | 'EMAIL' 
+  | 'JSON';
+
+export type EditMethod = 
+  | 'INPUT' 
+  | 'WYSIWYG' 
+  | 'MARKDOWN' 
+  | 'CODE' 
+  | 'DATE_PICKER' 
+  | 'DATETIME_PICKER' 
+  | 'FILE_UPLOAD' 
+  | 'IMAGE_UPLOAD' 
+  | 'SELECT_DROPDOWN' 
+  | 'CHECKBOX' 
+  | 'RADIO' 
+  | 'SLIDER' 
+  | 'COLOR_PICKER';
+
+export interface UniversityFieldConfig {
+  id: number;
+  universityId: number;
+  fieldKey: string;
+  fieldName: string;
+  fieldType: FieldType;
+  defaultValue?: string;
+  required: boolean;
+  visible: boolean;
+  displayOrder: number;
+  editMethod: EditMethod;
+  editOptions?: string; // JSON形式
+  validationRules?: string; // JSON形式
+  displayConfig?: string; // JSON形式
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UniversityFieldConfigRequest {
+  universityId: number;
+  fieldKey: string;
+  fieldName: string;
+  fieldType: FieldType;
+  defaultValue?: string;
+  required?: boolean;
+  visible?: boolean;
+  displayOrder?: number;
+  editMethod: EditMethod;
+  editOptions?: string;
+  validationRules?: string;
+  displayConfig?: string;
+  description?: string;
+}
+
+// 大学レイアウト設定
+export type LayoutType = 
+  | 'CONTENT_EDIT' 
+  | 'CONTENT_LIST' 
+  | 'CONTENT_DETAIL' 
+  | 'DASHBOARD' 
+  | 'ADMIN_PANEL';
+
+export interface UniversityLayoutConfig {
+  id: number;
+  universityId: number;
+  layoutType: LayoutType;
+  sectionKey: string;
+  sectionName: string;
+  displayOrder: number;
+  visible: boolean;
+  layoutConfig?: string; // JSON形式
+  fieldKeys?: string; // JSON配列形式
+  styleConfig?: string; // JSON形式
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UniversityLayoutConfigRequest {
+  universityId: number;
+  layoutType: LayoutType;
+  sectionKey: string;
+  sectionName: string;
+  displayOrder?: number;
+  visible?: boolean;
+  layoutConfig?: string;
+  fieldKeys?: string;
+  styleConfig?: string;
+  description?: string;
+}

@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { ContentRequest, University, ContentCategory } from '@/lib/types';
+import { DynamicContentForm } from './DynamicContentForm';
 
 function NewContentForm() {
   const router = useRouter();
@@ -231,6 +232,25 @@ function NewContentForm() {
                 )}
               </div>
 
+              {/* 大学ごとの動的フィールド */}
+              {universityId && (
+                <div className="space-y-6 pt-6 border-t border-slate-200/50">
+                  <h2 className="text-xl font-bold text-slate-800">カスタムフィールド</h2>
+                  <DynamicContentForm
+                    universityId={universityId}
+                    onSubmit={onSubmit}
+                    loading={loading}
+                    errors={errors}
+                    register={register}
+                    control={undefined}
+                    watch={watch}
+                    setValue={setValue}
+                    formErrors={errors}
+                  />
+                </div>
+              )}
+
+              {/* デフォルトの本文フィールド（設定がない場合のフォールバック） */}
               <div className="space-y-2">
                 <label htmlFor="body" className="block text-sm font-bold text-slate-700">
                   本文
