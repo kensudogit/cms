@@ -19,15 +19,24 @@ export default function ContentsPage() {
   const fileInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
 
   // 大学一覧を取得
-  const { data: universities } = useQuery<University[]>({
+  const { data: universities, isLoading: universitiesLoading } = useQuery<University[]>({
     queryKey: ['universities'],
     queryFn: async () => {
       try {
         const response = await apiClient.get('/api/university/active');
-        return response.data || [];
+        const data = response.data || [];
+        console.log('Fetched universities:', data);
+        return data;
       } catch (error) {
         console.warn('Failed to fetch universities:', error);
-        return [];
+        // フォールバック: すべての大学を取得
+        try {
+          const response = await apiClient.get('/api/university');
+          return response.data || [];
+        } catch (fallbackError) {
+          console.warn('Failed to fetch all universities:', fallbackError);
+          return [];
+        }
       }
     },
   });
@@ -222,15 +231,30 @@ export default function ContentsPage() {
                         setSelectedUniversityId(value ? Number(value) : null);
                         setSelectedFields(new Set()); // フィールド選択をリセット
                       }}
-                      className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium"
+                      disabled={universitiesLoading}
+                      className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <option value="">すべての大学</option>
-                      {universities?.map((univ) => (
-                        <option key={univ.id} value={univ.id}>
-                          {univ.name}
-                        </option>
-                      ))}
+                      {universitiesLoading ? (
+                        <option value="" disabled>読み込み中...</option>
+                      ) : (
+                        universities && universities.length > 0 ? (
+                          universities.map((univ) => (
+                            <option key={univ.id} value={univ.id}>
+                              {univ.name} {univ.code ? `(${univ.code})` : ''}
+                            </option>
+                          ))
+                        ) : (
+                          <option value="" disabled>大学が登録されていません</option>
+                        )
+                      )}
                     </select>
+                    {universitiesLoading && (
+                      <p className="text-xs text-slate-500 mt-1">大学データを読み込み中...</p>
+                    )}
+                    {!universitiesLoading && universities && universities.length === 0 && (
+                      <p className="text-xs text-slate-500 mt-1">大学が登録されていません。先に大学を登録してください。</p>
+                    )}
                   </div>
                   {selectedUniversityId && (
                     <div>
@@ -294,46 +318,12 @@ export default function ContentsPage() {
                           <tr key={content.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
                             {displayFields.includes('title') && (
                               <td className="py-4 px-4">
-                                <div className="flex items-center space-x-3">
-                                  <Link
-                                    href={`/dashboard/contents/${content.id}`}
-                                    className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline"
-                                  >
-                                    {content.title}
-                                  </Link>
-                                  <button
-                                    onClick={() => handleFileSelect(content.id)}
-                                    disabled={uploadingContentId === content.id}
-                                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 disabled:cursor-not-allowed text-white rounded-lg text-xs font-semibold transition-all flex items-center space-x-1"
-                                    title="ファイルをアップロード"
-                                  >
-                                    {uploadingContentId === content.id ? (
-                                      <>
-                                        <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
-                                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        <span>アップロード中...</span>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                        </svg>
-                                        <span>アップロード</span>
-                                      </>
-                                    )}
-                                  </button>
-                                  <input
-                                    ref={(el) => {
-                                      fileInputRefs.current[content.id] = el;
-                                    }}
-                                    type="file"
-                                    className="hidden"
-                                    onChange={(e) => handleFileChange(content.id, e)}
-                                    accept="*/*"
-                                  />
-                                </div>
+                                <Link
+                                  href={`/dashboard/contents/${content.id}`}
+                                  className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline"
+                                >
+                                  {content.title}
+                                </Link>
                               </td>
                             )}
                             {displayFields.includes('slug') && (
@@ -391,6 +381,38 @@ export default function ContentsPage() {
                                 >
                                   削除
                                 </button>
+                                <button
+                                  onClick={() => handleFileSelect(content.id)}
+                                  disabled={uploadingContentId === content.id}
+                                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 disabled:cursor-not-allowed text-white rounded-lg text-xs font-semibold transition-all flex items-center space-x-1"
+                                  title="ファイルを登録"
+                                >
+                                  {uploadingContentId === content.id ? (
+                                    <>
+                                      <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                      </svg>
+                                      <span>登録中...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                      </svg>
+                                      <span>登録</span>
+                                    </>
+                                  )}
+                                </button>
+                                <input
+                                  ref={(el) => {
+                                    fileInputRefs.current[content.id] = el;
+                                  }}
+                                  type="file"
+                                  className="hidden"
+                                  onChange={(e) => handleFileChange(content.id, e)}
+                                  accept="*/*"
+                                />
                               </div>
                             </td>
                           </tr>
