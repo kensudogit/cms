@@ -23,9 +23,44 @@ export default function ContentsPage() {
   const { data: universities, isLoading: universitiesLoading } = useQuery<University[]>({
     queryKey: ['universities'],
     queryFn: async () => {
+      // 開発モードでモックデータを優先的に使用（環境変数で制御可能）
+      const useMockData = process.env.NEXT_PUBLIC_USE_MOCK_UNIVERSITIES === 'true';
+      // 開発環境では常にモックデータを使用（本番環境では環境変数で制御）
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      
+      if (useMockData || isDevelopment) {
+        console.log('Using mock universities data (forced)');
+        // 開発環境ではモックデータを優先的に使用
+        // APIからデータを取得してマージすることも可能
+        try {
+          const response = await apiClient.get('/api/university/active');
+          const data = response.data || [];
+          // APIからデータが取得できた場合はマージ、空の場合はモックデータのみ
+          if (data.length > 0) {
+            console.log('Merging API data with mock data');
+            // APIデータとモックデータをマージ（重複を避ける）
+            const merged = [...data];
+            mockUniversities.forEach(mock => {
+              if (!merged.find(u => u.id === mock.id)) {
+                merged.push(mock);
+              }
+            });
+            return merged;
+          }
+        } catch (error) {
+          console.warn('Failed to fetch universities in development mode, using mock data only:', error);
+        }
+        return mockUniversities;
+      }
+
       try {
         const response = await apiClient.get('/api/university/active');
         const data = response.data || [];
+        // APIからデータが取得できたが空の場合はモックデータを使用
+        if (data.length === 0) {
+          console.log('No universities from API, using mock data');
+          return mockUniversities;
+        }
         console.log('Fetched universities:', data);
         return data;
       } catch (error) {
@@ -33,7 +68,12 @@ export default function ContentsPage() {
         // フォールバック: すべての大学を取得
         try {
           const response = await apiClient.get('/api/university');
-          return response.data || [];
+          const data = response.data || [];
+          if (data.length === 0) {
+            console.log('No universities from fallback API, using mock data');
+            return mockUniversities;
+          }
+          return data;
         } catch (fallbackError) {
           console.warn('Failed to fetch all universities, using mock data:', fallbackError);
           // モックデータを返す
@@ -41,6 +81,10 @@ export default function ContentsPage() {
         }
       }
     },
+    // デフォルトでモックデータを使用（開発環境）
+    initialData: mockUniversities,
+    // キャッシュが無効な場合もモックデータを返す
+    placeholderData: mockUniversities,
   });
 
   // コンテンツ一覧を取得
@@ -240,15 +284,19 @@ export default function ContentsPage() {
                       {universitiesLoading ? (
                         <option value="" disabled>読み込み中...</option>
                       ) : (
-                        universities && universities.length > 0 ? (
-                          universities.map((univ) => (
-                            <option key={univ.id} value={univ.id}>
-                              {univ.name} {univ.code ? `(${univ.code})` : ''}
-                            </option>
-                          ))
-                        ) : (
-                          <option value="" disabled>大学が登録されていません</option>
-                        )
+                        (() => {
+                          // モックデータをフォールバックとして使用
+                          const displayUniversities = (universities && universities.length > 0) ? universities : mockUniversities;
+                          return displayUniversities.length > 0 ? (
+                            displayUniversities.map((univ) => (
+                              <option key={univ.id} value={univ.id}>
+                                {univ.name} {univ.code ? `(${univ.code})` : ''}
+                              </option>
+                            ))
+                          ) : (
+                            <option value="" disabled>大学が登録されていません</option>
+                          );
+                        })()
                       )}
                     </select>
                     {universitiesLoading && (
