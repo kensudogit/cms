@@ -8,6 +8,7 @@ import apiClient from '@/lib/api';
 import { Content, University, UniversityLayoutConfig } from '@/lib/types';
 import { sampleContents } from '@/lib/sampleData';
 import { allUniversityContents } from '@/lib/universityMockData';
+import { mockUniversities } from '@/lib/mockData';
 import { AdminSidebar } from '@/components/AdminSidebar';
 
 export default function ContentsPage() {
@@ -34,8 +35,9 @@ export default function ContentsPage() {
           const response = await apiClient.get('/api/university');
           return response.data || [];
         } catch (fallbackError) {
-          console.warn('Failed to fetch all universities:', fallbackError);
-          return [];
+          console.warn('Failed to fetch all universities, using mock data:', fallbackError);
+          // モックデータを返す
+          return mockUniversities;
         }
       }
     },

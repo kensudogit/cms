@@ -1,4 +1,4 @@
-import { Content, User } from './types';
+import { Content, User, University } from './types';
 
 // ユーザー情報のモックデータ
 export const mockUsers: User[] = [
@@ -49,5 +49,74 @@ export const getMockUserById = (id: number): User | undefined => {
 // すべてのユーザーを取得
 export const getMockUsers = (): User[] => {
   return mockUsers;
+};
+
+// 大学情報のモックデータ
+export const mockUniversities: University[] = [
+  {
+    id: 1,
+    code: 'UT',
+    name: '東京大学',
+    description: '日本の国立大学',
+    domain: 'u-tokyo.ac.jp',
+    active: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: 2,
+    code: 'KU',
+    name: '京都大学',
+    description: '日本の国立大学',
+    domain: 'kyoto-u.ac.jp',
+    active: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: 3,
+    code: 'OSU',
+    name: '大阪大学',
+    description: '日本の国立大学',
+    domain: 'osaka-u.ac.jp',
+    active: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: 4,
+    code: 'TIT',
+    name: '東京工業大学',
+    description: '日本の国立大学',
+    domain: 'titech.ac.jp',
+    active: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: 5,
+    code: 'WU',
+    name: '早稲田大学',
+    description: '日本の私立大学',
+    domain: 'waseda.jp',
+    active: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: 6,
+    code: 'KUW',
+    name: '慶應義塾大学',
+    description: '日本の私立大学',
+    domain: 'keio.ac.jp',
+    active: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  },
+];
+
+// すべての大学を取得
+export const getMockUniversities = (): University[] => {
+  return mockUniversities;
 };
 
