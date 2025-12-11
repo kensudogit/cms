@@ -37,4 +37,3 @@ public class UniversityLayoutConfigRequest {
 
     private String description;
 }
-

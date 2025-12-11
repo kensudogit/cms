@@ -10,21 +10,20 @@ import java.util.Optional;
 @Repository
 public interface UniversityLayoutConfigRepository extends JpaRepository<UniversityLayoutConfig, Long> {
     List<UniversityLayoutConfig> findByUniversityId(Long universityId);
-    
+
     List<UniversityLayoutConfig> findByUniversityIdAndLayoutTypeAndVisibleTrueOrderByDisplayOrderAsc(
-            Long universityId, 
+            Long universityId,
             UniversityLayoutConfig.LayoutType layoutType);
-    
+
     Optional<UniversityLayoutConfig> findByUniversityIdAndLayoutTypeAndSectionKey(
-            Long universityId, 
-            UniversityLayoutConfig.LayoutType layoutType, 
+            Long universityId,
+            UniversityLayoutConfig.LayoutType layoutType,
             String sectionKey);
-    
+
     boolean existsByUniversityIdAndLayoutTypeAndSectionKey(
-            Long universityId, 
-            UniversityLayoutConfig.LayoutType layoutType, 
+            Long universityId,
+            UniversityLayoutConfig.LayoutType layoutType,
             String sectionKey);
-    
+
     void deleteByUniversityId(Long universityId);
 }
-

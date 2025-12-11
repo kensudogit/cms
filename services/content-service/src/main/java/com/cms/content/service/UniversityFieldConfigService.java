@@ -82,7 +82,7 @@ public class UniversityFieldConfigService {
 
         // 大学IDとフィールドキーの組み合わせが変更される場合の重複チェック
         if (!config.getUniversityId().equals(request.getUniversityId()) ||
-            !config.getFieldKey().equals(request.getFieldKey())) {
+                !config.getFieldKey().equals(request.getFieldKey())) {
             if (fieldConfigRepository.existsByUniversityIdAndFieldKey(
                     request.getUniversityId(), request.getFieldKey())) {
                 throw new RuntimeException("Field config already exists for this university and field key");
@@ -140,4 +140,3 @@ public class UniversityFieldConfigService {
                 .build();
     }
 }
-

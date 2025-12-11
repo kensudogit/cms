@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
  * 各大学で出力される項目、編集方法、表示位置を定義
  */
 @Entity
-@Table(name = "university_field_configs", 
-       uniqueConstraints = @UniqueConstraint(columnNames = {"university_id", "field_key"}))
+@Table(name = "university_field_configs", uniqueConstraints = @UniqueConstraint(columnNames = { "university_id",
+        "field_key" }))
 @Data
 @Builder
 @NoArgsConstructor
@@ -86,39 +86,38 @@ public class UniversityFieldConfig {
      * フィールドタイプ
      */
     public enum FieldType {
-        TEXT,           // テキスト
-        TEXTAREA,       // テキストエリア
-        RICH_TEXT,      // リッチテキスト（WYSIWYG）
-        NUMBER,         // 数値
-        DATE,           // 日付
-        DATETIME,       // 日時
-        BOOLEAN,        // 真偽値
-        SELECT,         // セレクトボックス
-        MULTI_SELECT,   // 複数選択
-        FILE,           // ファイル
-        IMAGE,          // 画像
-        URL,            // URL
-        EMAIL,          // メールアドレス
-        JSON            // JSON
+        TEXT, // テキスト
+        TEXTAREA, // テキストエリア
+        RICH_TEXT, // リッチテキスト（WYSIWYG）
+        NUMBER, // 数値
+        DATE, // 日付
+        DATETIME, // 日時
+        BOOLEAN, // 真偽値
+        SELECT, // セレクトボックス
+        MULTI_SELECT, // 複数選択
+        FILE, // ファイル
+        IMAGE, // 画像
+        URL, // URL
+        EMAIL, // メールアドレス
+        JSON // JSON
     }
 
     /**
      * 編集方法
      */
     public enum EditMethod {
-        INPUT,          // 通常の入力
-        WYSIWYG,        // WYSIWYGエディタ
-        MARKDOWN,       // Markdownエディタ
-        CODE,           // コードエディタ
-        DATE_PICKER,    // 日付ピッカー
-        DATETIME_PICKER,// 日時ピッカー
-        FILE_UPLOAD,    // ファイルアップロード
-        IMAGE_UPLOAD,   // 画像アップロード
-        SELECT_DROPDOWN,// ドロップダウン選択
-        CHECKBOX,       // チェックボックス
-        RADIO,          // ラジオボタン
-        SLIDER,         // スライダー
-        COLOR_PICKER    // カラーピッカー
+        INPUT, // 通常の入力
+        WYSIWYG, // WYSIWYGエディタ
+        MARKDOWN, // Markdownエディタ
+        CODE, // コードエディタ
+        DATE_PICKER, // 日付ピッカー
+        DATETIME_PICKER, // 日時ピッカー
+        FILE_UPLOAD, // ファイルアップロード
+        IMAGE_UPLOAD, // 画像アップロード
+        SELECT_DROPDOWN, // ドロップダウン選択
+        CHECKBOX, // チェックボックス
+        RADIO, // ラジオボタン
+        SLIDER, // スライダー
+        COLOR_PICKER // カラーピッカー
     }
 }
-

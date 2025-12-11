@@ -68,4 +68,3 @@ public class UniversityFieldConfigController {
         return ResponseEntity.noContent().build();
     }
 }
-

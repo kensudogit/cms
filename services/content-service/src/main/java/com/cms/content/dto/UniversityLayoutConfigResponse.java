@@ -27,4 +27,3 @@ public class UniversityLayoutConfigResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
-

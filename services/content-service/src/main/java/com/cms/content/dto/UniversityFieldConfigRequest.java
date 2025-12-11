@@ -44,4 +44,3 @@ public class UniversityFieldConfigRequest {
 
     private String description;
 }
-

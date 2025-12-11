@@ -72,4 +72,3 @@ public class UniversityLayoutConfigController {
         return ResponseEntity.noContent().build();
     }
 }
-

@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
  * 各大学のレイアウト構造、セクション配置を定義
  */
 @Entity
-@Table(name = "university_layout_configs",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"university_id", "layout_type", "section_key"}))
+@Table(name = "university_layout_configs", uniqueConstraints = @UniqueConstraint(columnNames = { "university_id",
+        "layout_type", "section_key" }))
 @Data
 @Builder
 @NoArgsConstructor
@@ -76,11 +76,10 @@ public class UniversityLayoutConfig {
      * レイアウトタイプ
      */
     public enum LayoutType {
-        CONTENT_EDIT,       // コンテンツ編集画面
-        CONTENT_LIST,       // コンテンツ一覧画面
-        CONTENT_DETAIL,     // コンテンツ詳細画面
-        DASHBOARD,          // ダッシュボード
-        ADMIN_PANEL        // 管理パネル
+        CONTENT_EDIT, // コンテンツ編集画面
+        CONTENT_LIST, // コンテンツ一覧画面
+        CONTENT_DETAIL, // コンテンツ詳細画面
+        DASHBOARD, // ダッシュボード
+        ADMIN_PANEL // 管理パネル
     }
 }
-

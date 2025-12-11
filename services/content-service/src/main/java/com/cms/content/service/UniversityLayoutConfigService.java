@@ -25,7 +25,7 @@ public class UniversityLayoutConfigService {
     }
 
     public List<UniversityLayoutConfigResponse> getLayoutConfigsByUniversityAndType(
-            Long universityId, 
+            Long universityId,
             UniversityLayoutConfig.LayoutType layoutType) {
         return layoutConfigRepository
                 .findByUniversityIdAndLayoutTypeAndVisibleTrueOrderByDisplayOrderAsc(universityId, layoutType)
@@ -59,8 +59,8 @@ public class UniversityLayoutConfigService {
 
         // 重複チェック
         if (layoutConfigRepository.existsByUniversityIdAndLayoutTypeAndSectionKey(
-                request.getUniversityId(), 
-                request.getLayoutType(), 
+                request.getUniversityId(),
+                request.getLayoutType(),
                 request.getSectionKey())) {
             throw new RuntimeException("Layout config already exists for this university, layout type and section key");
         }
@@ -89,13 +89,14 @@ public class UniversityLayoutConfigService {
 
         // 大学ID、レイアウトタイプ、セクションキーの組み合わせが変更される場合の重複チェック
         if (!config.getUniversityId().equals(request.getUniversityId()) ||
-            !config.getLayoutType().equals(request.getLayoutType()) ||
-            !config.getSectionKey().equals(request.getSectionKey())) {
+                !config.getLayoutType().equals(request.getLayoutType()) ||
+                !config.getSectionKey().equals(request.getSectionKey())) {
             if (layoutConfigRepository.existsByUniversityIdAndLayoutTypeAndSectionKey(
-                    request.getUniversityId(), 
-                    request.getLayoutType(), 
+                    request.getUniversityId(),
+                    request.getLayoutType(),
                     request.getSectionKey())) {
-                throw new RuntimeException("Layout config already exists for this university, layout type and section key");
+                throw new RuntimeException(
+                        "Layout config already exists for this university, layout type and section key");
             }
         }
 
@@ -144,4 +145,3 @@ public class UniversityLayoutConfigService {
                 .build();
     }
 }
-
