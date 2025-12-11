@@ -18,6 +18,7 @@ export default function ContentDetailPage() {
   const userId = useAuthStore((state) => state.userId);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isMockData, setIsMockData] = useState(false);
 
   const { data: content, isLoading } = useQuery<Content>({
     queryKey: ['content', id],
@@ -25,10 +26,25 @@ export default function ContentDetailPage() {
       try {
         // APIからコンテンツを取得
         const response = await apiClient.get(`/api/content/${id}`);
+        setIsMockData(false);
         return response.data;
       } catch (error: any) {
         // APIが失敗した場合、モックデータをフォールバックとして使用
         console.warn('API request failed, using mock data:', error);
+        setIsMockData(true);
+        
+        // ローカルストレージから編集済みのモックデータを取得
+        const storageKey = `mock_content_${id}`;
+        const storedContent = localStorage.getItem(storageKey);
+        if (storedContent) {
+          try {
+            const parsed = JSON.parse(storedContent);
+            return parsed;
+          } catch {
+            // パースエラーは無視
+          }
+        }
+        
         // まず大学関連のモックデータから検索
         const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
         const universityContent = allUniversityContents.find((c) => c.id === numericId);
@@ -114,6 +130,18 @@ export default function ContentDetailPage() {
 
   const updateMutation = useMutation({
     mutationFn: async (data: ContentRequest) => {
+      // モックデータの場合はローカルストレージに保存
+      if (isMockData) {
+        const updatedContent: Content = {
+          ...content!,
+          ...data,
+          updatedAt: new Date().toISOString(),
+        };
+        const storageKey = `mock_content_${id}`;
+        localStorage.setItem(storageKey, JSON.stringify(updatedContent));
+        return updatedContent;
+      }
+      
       try {
         // APIを呼び出してコンテンツを更新
         const response = await apiClient.put(`/api/content/${id}`, data, {
@@ -143,6 +171,13 @@ export default function ContentDetailPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
+      // モックデータの場合はローカルストレージから削除
+      if (isMockData) {
+        const storageKey = `mock_content_${id}`;
+        localStorage.removeItem(storageKey);
+        return;
+      }
+      
       try {
         // APIを呼び出してコンテンツを削除
         await apiClient.delete(`/api/content/${id}`, {
@@ -158,7 +193,7 @@ export default function ContentDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contents'] });
       queryClient.removeQueries({ queryKey: ['content', id] });
-      router.push('/dashboard');
+      router.push('/dashboard/contents');
     },
     onError: (err: any) => {
       const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'エラーが発生しました';
@@ -288,6 +323,21 @@ export default function ContentDetailPage() {
       <main className="relative max-w-4xl mx-auto py-8 sm:px-6 lg:px-8 animate-fade-in">
         <div className="px-4 py-6 sm:px-0">
           <div className="glass-card shadow-2xl rounded-3xl p-8 border border-white/50">
+            {isMockData && (
+              <div className="mb-6 bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 border-l-4 border-amber-500 text-amber-700 px-5 py-4 rounded-xl shadow-lg animate-slide-up backdrop-blur-sm">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mr-3">
+                    <svg className="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="font-semibold">モックデータモード</p>
+                    <p className="text-sm mt-1">このコンテンツはモックデータです。編集内容はローカルストレージに保存されます。</p>
+                  </div>
+                </div>
+              </div>
+            )}
             {error && (
               <div className="mb-6 bg-gradient-to-r from-red-50 via-pink-50 to-rose-50 border-l-4 border-red-500 text-red-700 px-5 py-4 rounded-xl shadow-lg animate-slide-up backdrop-blur-sm">
                 <div className="flex items-center">
