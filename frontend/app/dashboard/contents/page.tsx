@@ -369,7 +369,7 @@ export default function ContentsPage() {
                             {displayFields.includes('title') && (
                               <td className="py-4 px-4">
                                 <Link
-                                  href={`/dashboard/contents/${content.id}`}
+                                  href={`/dashboard/contents/${encodeURIComponent(content.title)}`}
                                   className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline"
                                 >
                                   {content.title}

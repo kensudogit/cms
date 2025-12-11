@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/authStore';
 import apiClient from '@/lib/api';
 import { Content, ContentRequest } from '@/lib/types';
-import { getMockContentById } from '@/lib/mockData';
+import { getMockContentById, getMockContentByTitle, searchMockContentsByTitle } from '@/lib/mockData';
 import { allUniversityContents } from '@/lib/universityMockData';
 
 export default function ContentDetailPage() {
@@ -35,10 +35,37 @@ export default function ContentDetailPage() {
         if (universityContent) {
           return universityContent;
         }
-        // 次に一般的なモックデータから検索
+        // 次に一般的なモックデータから検索（IDで）
         const mockContent = getMockContentById(id);
         if (mockContent) {
           return mockContent;
+        }
+        // IDが数値でない場合、またはIDが見つからない場合、タイトルとして検索を試みる
+        if (typeof id === 'string' && isNaN(numericId)) {
+          // URLエンコードされたタイトルをデコード
+          const decodedTitle = decodeURIComponent(id);
+          // まず一般的なモックデータから検索
+          const titleContent = getMockContentByTitle(decodedTitle);
+          if (titleContent) {
+            return titleContent;
+          }
+          // 大学関連のモックデータからも検索
+          const universityTitleContent = allUniversityContents.find((c) => c.title === decodedTitle);
+          if (universityTitleContent) {
+            return universityTitleContent;
+          }
+          // タイトルで部分一致検索（一般的なモックデータ）
+          const searchResults = searchMockContentsByTitle(decodedTitle);
+          if (searchResults.length > 0) {
+            return searchResults[0]; // 最初の結果を返す
+          }
+          // タイトルで部分一致検索（大学関連のモックデータ）
+          const universitySearchResults = allUniversityContents.filter((c) => 
+            c.title.toLowerCase().includes(decodedTitle.toLowerCase())
+          );
+          if (universitySearchResults.length > 0) {
+            return universitySearchResults[0]; // 最初の結果を返す
+          }
         }
         throw new Error('Content not found');
       }
