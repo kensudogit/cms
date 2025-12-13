@@ -18,6 +18,9 @@ export default function ContentsPage() {
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
   const [uploadingContentId, setUploadingContentId] = useState<number | null>(null);
   const fileInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  // ページネーション用のstate
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // 大学一覧を取得
   const { data: universities, isLoading: universitiesLoading } = useQuery<University[]>({
@@ -134,6 +137,20 @@ export default function ContentsPage() {
           }
         })
     : ['title', 'status', 'contentType', 'updatedAt']; // デフォルトフィールド
+
+  // ページネーション計算
+  const totalItems = contents?.length || 0;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedContents = contents?.slice(startIndex, endIndex) || [];
+
+  // 大学フィルタが変更されたら、ページを1にリセット
+  const handleUniversityChange = (value: string) => {
+    setSelectedUniversityId(value ? Number(value) : null);
+    setSelectedFields(new Set()); // フィールド選択をリセット
+    setCurrentPage(1); // ページを1にリセット
+  };
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -272,11 +289,7 @@ export default function ContentsPage() {
                     </label>
                     <select
                       value={selectedUniversityId || ''}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setSelectedUniversityId(value ? Number(value) : null);
-                        setSelectedFields(new Set()); // フィールド選択をリセット
-                      }}
+                      onChange={(e) => handleUniversityChange(e.target.value)}
                       disabled={universitiesLoading}
                       className="block w-full border-2 border-slate-200 rounded-xl shadow-sm py-3 px-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/90 hover:bg-white text-slate-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -364,7 +377,7 @@ export default function ContentsPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {contents.map((content) => (
+                        {paginatedContents.map((content) => (
                           <tr key={content.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
                             {displayFields.includes('title') && (
                               <td className="py-4 px-4">
@@ -470,6 +483,110 @@ export default function ContentsPage() {
                       </tbody>
                     </table>
                   </div>
+                  
+                  {/* ページネーション */}
+                  {totalPages > 1 && (
+                    <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                      {/* 件数表示とページサイズ選択 */}
+                      <div className="flex items-center gap-4">
+                        <div className="text-sm text-slate-600">
+                          全 <span className="font-bold text-slate-800">{totalItems}</span> 件中{' '}
+                          <span className="font-bold text-slate-800">
+                            {startIndex + 1} - {Math.min(endIndex, totalItems)}
+                          </span>{' '}
+                          件を表示
+                        </div>
+                        <select
+                          value={itemsPerPage}
+                          onChange={(e) => {
+                            setItemsPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                          }}
+                          className="border-2 border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                          <option value={5}>5件 / ページ</option>
+                          <option value={10}>10件 / ページ</option>
+                          <option value={20}>20件 / ページ</option>
+                          <option value={50}>50件 / ページ</option>
+                        </select>
+                      </div>
+
+                      {/* ページネーションボタン */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setCurrentPage(1)}
+                          disabled={currentPage === 1}
+                          className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 bg-white border-2 border-slate-200 hover:bg-slate-50 hover:border-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                          title="最初のページ"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                          disabled={currentPage === 1}
+                          className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 bg-white border-2 border-slate-200 hover:bg-slate-50 hover:border-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                          title="前のページ"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                        </button>
+
+                        {/* ページ番号 */}
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                            let pageNum: number;
+                            if (totalPages <= 5) {
+                              pageNum = i + 1;
+                            } else if (currentPage <= 3) {
+                              pageNum = i + 1;
+                            } else if (currentPage >= totalPages - 2) {
+                              pageNum = totalPages - 4 + i;
+                            } else {
+                              pageNum = currentPage - 2 + i;
+                            }
+
+                            return (
+                              <button
+                                key={pageNum}
+                                onClick={() => setCurrentPage(pageNum)}
+                                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                                  currentPage === pageNum
+                                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+                                    : 'text-slate-700 bg-white border-2 border-slate-200 hover:bg-slate-50 hover:border-indigo-300'
+                                }`}
+                              >
+                                {pageNum}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        <button
+                          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                          disabled={currentPage === totalPages}
+                          className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 bg-white border-2 border-slate-200 hover:bg-slate-50 hover:border-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                          title="次のページ"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => setCurrentPage(totalPages)}
+                          disabled={currentPage === totalPages}
+                          className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 bg-white border-2 border-slate-200 hover:bg-slate-50 hover:border-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                          title="最後のページ"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-center py-20">
