@@ -377,8 +377,56 @@ export default function ContentsPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {paginatedContents.map((content) => (
-                          <tr key={content.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                        {paginatedContents.map((content, index) => {
+                          // 行の色を決定（交互のストライプ + ステータスに応じた色）
+                          const isEven = index % 2 === 0;
+                          
+                          // ステータスに応じた背景色
+                          let baseColor = '';
+                          if (content.status === 'PUBLISHED') {
+                            baseColor = isEven 
+                              ? 'bg-gradient-to-r from-emerald-50/40 via-teal-50/40 to-cyan-50/40' 
+                              : 'bg-gradient-to-r from-emerald-50/20 via-teal-50/20 to-cyan-50/20';
+                          } else if (content.status === 'DRAFT') {
+                            baseColor = isEven 
+                              ? 'bg-gradient-to-r from-amber-50/40 via-orange-50/40 to-yellow-50/40' 
+                              : 'bg-gradient-to-r from-amber-50/20 via-orange-50/20 to-yellow-50/20';
+                          } else {
+                            baseColor = isEven 
+                              ? 'bg-gradient-to-r from-slate-50/40 via-gray-50/40 to-slate-50/40' 
+                              : 'bg-gradient-to-r from-slate-50/20 via-gray-50/20 to-slate-50/20';
+                          }
+                          
+                          // ステータスに応じた左側のボーダーカラー
+                          let statusAccent = '';
+                          if (content.status === 'PUBLISHED') {
+                            statusAccent = 'border-l-4 border-emerald-500';
+                          } else if (content.status === 'DRAFT') {
+                            statusAccent = 'border-l-4 border-amber-500';
+                          } else {
+                            statusAccent = 'border-l-4 border-slate-400';
+                          }
+                          
+                          // コンテンツタイプに応じた右側のアクセント（オプション）
+                          let typeAccent = '';
+                          if (content.contentType) {
+                            const contentType = content.contentType.toLowerCase();
+                            if (contentType.includes('セミナー') || contentType.includes('seminar')) {
+                              typeAccent = 'border-r-2 border-purple-300';
+                            } else if (contentType.includes('シンポジウム') || contentType.includes('symposium')) {
+                              typeAccent = 'border-r-2 border-pink-300';
+                            } else if (contentType.includes('入学') || contentType.includes('admission')) {
+                              typeAccent = 'border-r-2 border-blue-300';
+                            } else if (contentType.includes('卒業') || contentType.includes('graduation')) {
+                              typeAccent = 'border-r-2 border-indigo-300';
+                            }
+                          }
+
+                          return (
+                          <tr 
+                            key={content.id} 
+                            className={`${baseColor} ${statusAccent} ${typeAccent} border-b border-slate-200/50 hover:shadow-lg hover:scale-[1.005] transition-all duration-200 group`}
+                          >
                             {displayFields.includes('title') && (
                               <td className="py-4 px-4">
                                 <Link
@@ -479,7 +527,8 @@ export default function ContentsPage() {
                               </div>
                             </td>
                           </tr>
-                        ))}
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
